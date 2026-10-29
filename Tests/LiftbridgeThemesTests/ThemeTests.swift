@@ -109,6 +109,17 @@ private func date(_ month: Int, _ day: Int) -> Date {
         #expect(black.onAccent.dark.contrast(with: black.accent.dark) >= 4.5, "\(black.onAccent.dark.hex) on \(black.accent.dark.hex)")
     }
 
+    @Test func blackPicksReadableTextForALightenedAccent() {
+        // An app whose light-mode text is white: white can't go on the
+        // lightened accent, so the text falls back to something that reads.
+        var palette = house.palette
+        palette.ink.light = .white
+        palette.accent.dark = RGB(0x3A1004)
+        let black = Theme(id: "odd", name: "Odd", swatch: house.swatch, palette: palette).black.palette
+        #expect(black.accent.dark.contrast(with: .black) >= 4.5)
+        #expect(black.onAccent.dark.contrast(with: black.accent.dark) >= 4.5)
+    }
+
     @Test func seasonsCoverTheirMonths() {
         let halloween = ThemeGroup.halloween.season!
         #expect(halloween.contains(date(10, 1)) && halloween.contains(date(10, 31)))

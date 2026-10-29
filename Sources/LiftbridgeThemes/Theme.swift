@@ -245,14 +245,13 @@ extension Palette {
         for role in [\Palette.ink, \.muted, \.success] {
             palette[keyPath: role].dark = Self.tuned(palette[keyPath: role].dark, on: backgrounds, step: 0.005)
         }
-        // An accent that has to lighten keeps going until dark text reads on
-        // it too: a mid-tone stops just short for both white and dark text.
         palette.accent.dark = Self.tuned(palette.accent.dark, on: backgrounds, step: 0.005)
         if palette.accent.dark != accent.dark {
-            palette.accent.dark = Self.tuned(palette.accent.dark, on: backgrounds + [palette.ink.light], step: 0.005)
-        }
-        if palette.accent.dark != accent.dark {
-            palette.onAccent.dark = Self.onFill(palette.accent.dark, ink: palette.ink)
+            // A lightened accent reads on pure black (the canvas), so black text
+            // always works on it; white or the app's dark text first if they do.
+            let fill = palette.accent.dark
+            palette.onAccent.dark = [RGB.white, palette.ink.light, .black]
+                .first { $0.contrast(with: fill) >= Self.readable } ?? .black
         }
         return palette
     }
