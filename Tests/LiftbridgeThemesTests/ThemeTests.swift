@@ -147,7 +147,7 @@ private func date(_ month: Int, _ day: Int) -> Date {
     @Test func blackModeServesTheBlackVersionOfTheChosenTheme() {
         let defaults = freshDefaults()
         let store = store(defaults)
-        let fern = ThemeGroup.solid.themes[3]
+        let fern = ThemeGroup.solid.themes.first { $0.id == "fern" }!
         store.select(fern)
         store.colorMode = .black
         #expect(store.theme.id == fern.id)
