@@ -152,32 +152,37 @@ public struct ThemeGroup: Identifiable, Hashable, Sendable {
 }
 
 extension Theme {
-    /// The theme for Black mode: dark-mode backgrounds go true black (OLED
-    /// pixels off), with cards and chips just above black so they still stand
-    /// apart. Light mode and every text and accent color are unchanged.
+    /// The theme for Black mode: the dark-mode canvas goes true black (OLED
+    /// pixels off); cards, chips and borders sit just above black with a hint
+    /// of the theme's color, so they still stand apart. Light mode is unchanged.
     public var black: Theme {
-        var palette = palette
-        palette.canvas.dark = RGB(0x000000)
-        palette.card.dark = RGB(0x0A0A0A)
-        palette.chip.dark = RGB(0x141414)
-        palette.hairline.dark = RGB(0x262626)
-        return Theme(id: id, name: name, swatch: swatch, palette: palette)
+        Theme(id: id, name: name, swatch: swatch, palette: palette.black)
     }
 }
 
 extension Palette {
-    /// Lightness and the most chroma for each background, light then dark.
-    /// Low chroma keeps the wash gentle so photos and text stay the focus.
+    /// Lightness and chroma for each background, light then dark. The canvas
+    /// and chips carry the theme's color clearly enough to tell themes apart
+    /// at a glance; cards stay close to white (or dark gray) so photos and
+    /// text stay the focus.
     private static let surfaces: (canvas: Recipe, card: Recipe, chip: Recipe, hairline: Recipe) = (
-        canvas: Recipe(light: (0.975, 0.018), dark: (0.17, 0.028)),
-        card: Recipe(light: (1.0, 0), dark: (0.225, 0.03)),
-        chip: Recipe(light: (0.945, 0.035), dark: (0.255, 0.034)),
-        hairline: Recipe(light: (0.9, 0.035), dark: (0.31, 0.038))
+        canvas: Recipe(light: (0.95, 0.045), dark: (0.2, 0.06)),
+        card: Recipe(light: (0.99, 0.014), dark: (0.255, 0.06)),
+        chip: Recipe(light: (0.905, 0.07), dark: (0.3, 0.07)),
+        hairline: Recipe(light: (0.86, 0.06), dark: (0.36, 0.06))
+    )
+    /// Black mode's surfaces: the canvas is #000000 and these match #0A0A0A,
+    /// #141414 and #262626 in lightness, tinted with the theme's hue.
+    private static let blackSurfaces: (card: (Double, Double), chip: (Double, Double), hairline: (Double, Double)) = (
+        card: (0.145, 0.03), chip: (0.185, 0.035), hairline: (0.27, 0.035)
     )
     private static let text: (ink: Recipe, muted: Recipe) = (
-        ink: Recipe(light: (0.23, 0.012), dark: (0.95, 0.012)),
-        muted: Recipe(light: (0.5, 0.02), dark: (0.77, 0.02))
+        ink: Recipe(light: (0.23, 0.02), dark: (0.95, 0.015)),
+        muted: Recipe(light: (0.47, 0.03), dark: (0.77, 0.025))
     )
+    /// A tint at least this vivid gets the full chroma above; paler ones
+    /// (pastels) get proportionally less, and a gray stays gray.
+    private static let fullTint = 0.05
     private static let defaultSuccess = Shade(0x3F6212, 0x9BC26A)
     /// WCAG AA for body text.
     static let readable = 4.5
@@ -186,37 +191,70 @@ extension Palette {
         let light: (lightness: Double, chroma: Double)
         let dark: (lightness: Double, chroma: Double)
 
-        func shade(hue: Double, chroma: Double) -> Shade {
-            Shade(light: RGB(OKLCH(lightness: light.lightness, chroma: min(chroma, light.chroma), hue: hue)),
-                  dark: RGB(OKLCH(lightness: dark.lightness, chroma: min(chroma, dark.chroma), hue: hue)))
+        /// `strength` 0...1: how much of this recipe's chroma the tint gets.
+        func shade(hue: Double, strength: Double) -> Shade {
+            Shade(light: RGB(OKLCH(lightness: light.lightness, chroma: light.chroma * strength, hue: hue)),
+                  dark: RGB(OKLCH(lightness: dark.lightness, chroma: dark.chroma * strength, hue: hue)))
         }
     }
 
     static func derived(accent: RGB, tint: RGB, accentOverride: Shade?, success: Shade?, neutral: Bool) -> Palette {
         let wash = tint.oklch
-        let chroma = neutral ? 0 : wash.chroma
-        let canvas = surfaces.canvas.shade(hue: wash.hue, chroma: chroma)
-        let card = surfaces.card.shade(hue: wash.hue, chroma: chroma)
-        let chip = surfaces.chip.shade(hue: wash.hue, chroma: chroma)
+        let strength = neutral ? 0 : min(wash.chroma / fullTint, 1)
+        let canvas = surfaces.canvas.shade(hue: wash.hue, strength: strength)
+        let card = surfaces.card.shade(hue: wash.hue, strength: strength)
+        let chip = surfaces.chip.shade(hue: wash.hue, strength: strength)
         let backgrounds = [canvas, card, chip]
-        let accentShade = accentOverride ?? Shade(
-            // Light mode: darken until it reads on every background (and white reads on it).
-            light: tuned(accent, on: backgrounds.map(\.light) + [.white], step: -0.005),
-            // Dark mode: no darker than a soft pastel, lightened until it reads.
-            dark: tuned(accent, on: backgrounds.map(\.dark), step: 0.005, floor: 0.72)
-        )
-        let ink = text.ink.shade(hue: wash.hue, chroma: chroma)
+        // Light mode: darkened until it reads on every background (and white
+        // reads on it). Dark mode: no darker than a soft pastel, lightened
+        // until it reads. Given colors only move if they wouldn't read.
+        func readable(_ shade: Shade, floor: Double = 0) -> Shade {
+            Shade(light: tuned(shade.light, on: backgrounds.map(\.light) + [.white], step: -0.005),
+                  dark: tuned(shade.dark, on: backgrounds.map(\.dark), step: 0.005, floor: floor))
+        }
+        let accentShade = accentOverride.map { readable($0) } ?? readable(Shade(light: accent, dark: accent), floor: 0.72)
+        let ink = text.ink.shade(hue: wash.hue, strength: strength)
         return Palette(
             accent: accentShade,
             onAccent: Shade(light: onFill(accentShade.light, ink: ink), dark: onFill(accentShade.dark, ink: ink)),
             canvas: canvas,
             card: card,
             chip: chip,
-            hairline: surfaces.hairline.shade(hue: wash.hue, chroma: chroma),
+            hairline: surfaces.hairline.shade(hue: wash.hue, strength: strength),
             ink: ink,
-            muted: text.muted.shade(hue: wash.hue, chroma: chroma),
-            success: success ?? defaultSuccess
+            muted: text.muted.shade(hue: wash.hue, strength: strength),
+            success: readable(success ?? defaultSuccess)
         )
+    }
+
+    /// Dark mode on true black (see `Theme.black`). Text, accent and success
+    /// colors keep their dark-mode values, lightened only where one wouldn't
+    /// read on the darker surfaces (an app's own palette can be anything).
+    var black: Palette {
+        let lch = card.dark.oklch
+        let strength = min(lch.chroma / Self.blackSurfaces.card.1, 1)
+        func surface(_ recipe: (Double, Double)) -> RGB {
+            RGB(OKLCH(lightness: recipe.0, chroma: recipe.1 * strength, hue: lch.hue))
+        }
+        var palette = self
+        palette.canvas.dark = .black
+        palette.card.dark = surface(Self.blackSurfaces.card)
+        palette.chip.dark = surface(Self.blackSurfaces.chip)
+        palette.hairline.dark = surface(Self.blackSurfaces.hairline)
+        let backgrounds = [palette.canvas.dark, palette.card.dark, palette.chip.dark]
+        for role in [\Palette.ink, \.muted, \.success] {
+            palette[keyPath: role].dark = Self.tuned(palette[keyPath: role].dark, on: backgrounds, step: 0.005)
+        }
+        // An accent that has to lighten keeps going until dark text reads on
+        // it too: a mid-tone stops just short for both white and dark text.
+        palette.accent.dark = Self.tuned(palette.accent.dark, on: backgrounds, step: 0.005)
+        if palette.accent.dark != accent.dark {
+            palette.accent.dark = Self.tuned(palette.accent.dark, on: backgrounds + [palette.ink.light], step: 0.005)
+        }
+        if palette.accent.dark != accent.dark {
+            palette.onAccent.dark = Self.onFill(palette.accent.dark, ink: palette.ink)
+        }
+        return palette
     }
 
     /// The source color moved along lightness only (same hue) until it has

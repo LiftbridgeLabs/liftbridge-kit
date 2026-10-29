@@ -16,7 +16,7 @@ Requires iOS 18 or tvOS 18 (macOS 15 for running the tests). `ThemePicker` is fo
 packages:
   LiftbridgeKit:
     url: https://github.com/LiftbridgeLabs/liftbridge-kit
-    from: 1.0.0
+    from: 2.0.0
 
 targets:
   MyApp:
@@ -27,7 +27,7 @@ targets:
 
 Add the same dependency to any extension that compiles the file holding the app's colors.
 
-**Plain Xcode:** File > Add Package Dependencies, paste `https://github.com/LiftbridgeLabs/liftbridge-kit`, choose "Up to Next Major Version" from 1.0.0, and add `LiftbridgeThemes` to the app target.
+**Plain Xcode:** File > Add Package Dependencies, paste `https://github.com/LiftbridgeLabs/liftbridge-kit`, choose "Up to Next Major Version" from 2.0.0, and add `LiftbridgeThemes` to the app target.
 
 ## Use LiftbridgeThemes
 
@@ -99,10 +99,10 @@ The choice is saved in `UserDefaults.standard` on the device. Widgets and extens
 
 ## Versions
 
-Apps depend on `from: 1.0.0`, so they take new 1.x releases when they update their packages, and never a 2.0.
+Apps depend on `from: 2.0.0`, so they take new 2.x releases when they update their packages, and never a 3.0.
 
-- **Minor (1.1.0):** new themes, a new season, renamed themes, fixes. Safe to take any time.
-- **Major (2.0.0):** a change an app has to adapt to. Listed in [CHANGELOG.md](CHANGELOG.md) with what to change.
+- **Minor (2.1.0):** new themes, a new season, renamed themes, fixes. Safe to take any time.
+- **Major (3.0.0):** a change an app has to adapt to. Listed in [CHANGELOG.md](CHANGELOG.md) with what to change.
 
 A theme's `id` is saved on people's devices and never changes once released; its name can. A removed theme falls back to the app's own look.
 
@@ -114,7 +114,7 @@ New themes and seasons reach people only in an app build that includes the newer
 swift test
 ```
 
-The tests check every theme for readable contrast (WCAG AA, 4.5:1) in light and dark mode, and cover seasons and saving the choice. CI runs them on every push.
+The tests check every theme for readable contrast (WCAG AA, 4.5:1) in light, dark and Black mode, check that themes in the same group look clearly different, and cover seasons and saving the choice. CI runs them on every push.
 
 ## License
 

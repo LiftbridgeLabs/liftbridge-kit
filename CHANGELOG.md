@@ -1,10 +1,13 @@
 # Changelog
 
-## 1.1.0 (Oct 29, 2026)
+## 2.0.0 (Oct 29, 2026)
 
-- **Black color mode** (`ColorMode.black`, saved as "black"): dark mode with true-black backgrounds for OLED screens, with any theme. The picker's mode row is now Light / Dark / Black / System. `ThemeStore.theme` returns the black version of the chosen theme while Black is on (`Theme.black`): canvas #000000, cards #0A0A0A, chips #141414, borders #262626; text and accent colors unchanged and tested for contrast on black.
+**To update:** change the package requirement to `from: 2.0.0`. If the app switches over every `ColorMode` case, add `.black`; apps that only use `colorMode.colorScheme` need no other change.
+
+- **Themes look clearly different.** Backgrounds now carry each theme's color in light and dark mode (canvas and chips clearly tinted, cards lightly), instead of only the accent changing. Maple is now red with a gold background, Jam Session has a grape-purple accent, and Snowfall has an icy-blue background. A test checks that themes in the same group look different.
+- **Black color mode** (`ColorMode.black`, saved as "black"): dark mode with a true-black canvas for OLED screens, with any theme. The picker's mode row is Light / Dark / Black / System. While Black is on, `ThemeStore.theme` returns the chosen theme's black version (`Theme.black`): canvas #000000; cards, chips and borders at the lightness of #0A0A0A, #141414 and #262626 with a hint of the theme's color. Text, accent and "done" colors stay the same unless one wouldn't read on black, including in an app's own palette.
 - **tvOS 18.** Everything builds for Apple TV except `ThemePicker` (iPhone, iPad and Mac only). `Swatch.gradient(for:)` is now public for an app's own picker.
-- An app that switches over every `ColorMode` case needs a `.black` case; apps that only use `colorMode.colorScheme` need no change.
+- Fixed colors (color-vision accents and "done" colors, an app's own success color) are adjusted where they wouldn't read on the stronger backgrounds.
 
 ## 1.0.0 (Oct 29, 2026)
 

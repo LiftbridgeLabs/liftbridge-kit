@@ -71,6 +71,44 @@ private func date(_ month: Int, _ day: Int) -> Date {
         }
     }
 
+    /// Themes side by side in the picker must look different: their
+    /// backgrounds and accents together, measured in OKLab.
+    @Test func themesInAGroupLookDifferent() {
+        func distance(_ a: RGB, _ b: RGB) -> Double {
+            let (x, y) = (a.oklch, b.oklch)
+            return hypot(x.lightness - y.lightness,
+                         hypot(x.chroma * cos(x.hue) - y.chroma * cos(y.hue), x.chroma * sin(x.hue) - y.chroma * sin(y.hue)))
+        }
+        for group in ThemeGroup.shared {
+            for (i, a) in group.themes.enumerated() {
+                for b in group.themes.dropFirst(i + 1) {
+                    let (p, q) = (a.palette, b.palette)
+                    let look = max(distance(p.canvas.light, q.canvas.light), distance(p.canvas.dark, q.canvas.dark))
+                        + distance(p.accent.light, q.accent.light)
+                    #expect(look >= 0.05, "\(a.name) and \(b.name) look alike (\(look))")
+                }
+            }
+        }
+    }
+
+    @Test func blackKeepsAnAppsOwnPaletteReadable() {
+        // A house palette whose "dark" mode is light gray with dark text.
+        var palette = house.palette
+        palette.canvas.dark = RGB(0xB0B0B0)
+        palette.card.dark = RGB(0xC0C0C0)
+        palette.chip.dark = RGB(0xA8A8A8)
+        palette.ink.dark = RGB(0x202020)
+        palette.muted.dark = RGB(0x404040)
+        palette.accent.dark = RGB(0x7A2E0A)
+        let black = Theme(id: "gray", name: "Gray", swatch: house.swatch, palette: palette).black.palette
+        for background in [black.canvas, black.card, black.chip].map(\.dark) {
+            for shade in [black.ink, black.muted, black.accent, black.success] {
+                #expect(shade.dark.contrast(with: background) >= 4.5)
+            }
+        }
+        #expect(black.onAccent.dark.contrast(with: black.accent.dark) >= 4.5, "\(black.onAccent.dark.hex) on \(black.accent.dark.hex)")
+    }
+
     @Test func seasonsCoverTheirMonths() {
         let halloween = ThemeGroup.halloween.season!
         #expect(halloween.contains(date(10, 1)) && halloween.contains(date(10, 31)))
