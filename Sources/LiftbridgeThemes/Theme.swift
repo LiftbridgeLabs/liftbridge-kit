@@ -151,6 +151,20 @@ public struct ThemeGroup: Identifiable, Hashable, Sendable {
     }
 }
 
+extension Theme {
+    /// The theme for Black mode: dark-mode backgrounds go true black (OLED
+    /// pixels off), with cards and chips just above black so they still stand
+    /// apart. Light mode and every text and accent color are unchanged.
+    public var black: Theme {
+        var palette = palette
+        palette.canvas.dark = RGB(0x000000)
+        palette.card.dark = RGB(0x0A0A0A)
+        palette.chip.dark = RGB(0x141414)
+        palette.hairline.dark = RGB(0x262626)
+        return Theme(id: id, name: name, swatch: swatch, palette: palette)
+    }
+}
+
 extension Palette {
     /// Lightness and the most chroma for each background, light then dark.
     /// Low chroma keeps the wash gentle so photos and text stay the focus.

@@ -1,7 +1,11 @@
 import SwiftUI
 
-/// Color mode (Light, Dark, System) and a grid of theme cards, grouped, with
-/// the in-season group marked "New". Push it from Settings.
+// iPhone, iPad and Mac. A TV app builds its own picker for the remote from
+// ThemeStore (visibleGroups, select, colorMode) and Swatch.gradient.
+#if !os(tvOS)
+
+/// Color mode (Light, Dark, Black, System) and a grid of theme cards, grouped,
+/// with the in-season group marked "New". Push it from Settings.
 public struct ThemePicker: View {
     @Bindable private var store: ThemeStore
     private let allSeasons: Bool
@@ -22,7 +26,7 @@ public struct ThemePicker: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 section("Color mode") {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         ForEach(ColorMode.allCases) { mode in modeButton(mode) }
                     }
                 }
@@ -71,12 +75,17 @@ public struct ThemePicker: View {
     private func modeButton(_ mode: ColorMode) -> some View {
         let selected = store.colorMode == mode
         return Button { store.colorMode = mode } label: {
-            Label(mode.title, systemImage: mode.systemImage)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .frame(maxWidth: .infinity, minHeight: 48)
-                .background(cardFill, in: shape)
-                .overlay(outline(selected))
+            // Icon over the word, so four fit across a phone.
+            VStack(spacing: 4) {
+                Image(systemName: mode.systemImage).imageScale(.medium)
+                Text(mode.title).lineLimit(1).minimumScaleFactor(0.8)
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(cardFill, in: shape)
+            .overlay(outline(selected))
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(selected ? .isSelected : [])
@@ -133,3 +142,5 @@ public struct ThemePicker: View {
         #endif
     }
 }
+
+#endif

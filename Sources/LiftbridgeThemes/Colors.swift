@@ -29,7 +29,8 @@ extension Shade {
 }
 
 extension Swatch {
-    func gradient(for scheme: ColorScheme) -> LinearGradient {
+    /// The swatch as drawn on a theme's card, for an app's own picker.
+    public func gradient(for scheme: ColorScheme) -> LinearGradient {
         LinearGradient(colors: (scheme == .dark ? dark : light).map(\.color),
                        startPoint: .topLeading, endPoint: .bottomTrailing)
     }

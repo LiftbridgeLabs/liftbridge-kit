@@ -6,7 +6,7 @@ import PackageDescription
 // the Mac (and in CI) without a simulator.
 let package = Package(
     name: "LiftbridgeKit",
-    platforms: [.iOS(.v18), .macOS(.v15)],
+    platforms: [.iOS(.v18), .tvOS(.v18), .macOS(.v15)],
     products: [
         .library(name: "LiftbridgeThemes", targets: ["LiftbridgeThemes"]),
     ],

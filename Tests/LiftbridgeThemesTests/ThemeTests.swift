@@ -58,6 +58,19 @@ private func date(_ month: Int, _ day: Int) -> Date {
         }
     }
 
+    @Test(arguments: allThemes + [house])
+    func everyThemeIsReadableOnBlack(_ theme: Theme) {
+        let p = theme.black.palette
+        #expect(p.canvas.dark == .black)
+        #expect(p.canvas.light == theme.palette.canvas.light)
+        for background in [p.canvas, p.card, p.chip].map(\.dark) {
+            for (role, shade) in [("accent", p.accent), ("ink", p.ink), ("muted", p.muted), ("success", p.success)] {
+                let ratio = shade.dark.contrast(with: background)
+                #expect(ratio >= 4.5, "\(theme.name) black: \(role) on \(background.hex) is \(ratio)")
+            }
+        }
+    }
+
     @Test func seasonsCoverTheirMonths() {
         let halloween = ThemeGroup.halloween.season!
         #expect(halloween.contains(date(10, 1)) && halloween.contains(date(10, 31)))
@@ -91,6 +104,20 @@ private func date(_ month: Int, _ day: Int) -> Date {
         let second = store(defaults)
         #expect(second.theme.id == ThemeGroup.twoTone.themes[0].id)
         #expect(second.colorMode == .dark)
+    }
+
+    @Test func blackModeServesTheBlackVersionOfTheChosenTheme() {
+        let defaults = freshDefaults()
+        let store = store(defaults)
+        let fern = ThemeGroup.solid.themes[3]
+        store.select(fern)
+        store.colorMode = .black
+        #expect(store.theme.id == fern.id)
+        #expect(store.theme.palette.canvas.dark == .black)
+        #expect(store.colorMode.colorScheme == .dark)
+        #expect(defaults.string(forKey: "LiftbridgeThemes.colorMode") == "black")
+        store.colorMode = .dark
+        #expect(store.theme.palette == fern.palette)
     }
 
     @Test func unknownSavedThemeFallsBackToHouse() {

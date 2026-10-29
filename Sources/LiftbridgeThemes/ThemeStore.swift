@@ -3,7 +3,8 @@ import Observation
 import SwiftUI
 
 public enum ColorMode: String, CaseIterable, Identifiable, Sendable {
-    case light, dark, system
+    /// `black` is dark mode with true-black backgrounds, for OLED screens.
+    case light, dark, black, system
 
     public var id: String { rawValue }
 
@@ -11,6 +12,7 @@ public enum ColorMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .light: "Light"
         case .dark: "Dark"
+        case .black: "Black"
         case .system: "System"
         }
     }
@@ -19,6 +21,7 @@ public enum ColorMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .light: "sun.max"
         case .dark: "moon"
+        case .black: "moon.fill"
         case .system: "circle.lefthalf.filled"
         }
     }
@@ -27,20 +30,23 @@ public enum ColorMode: String, CaseIterable, Identifiable, Sendable {
     public var colorScheme: ColorScheme? {
         switch self {
         case .light: .light
-        case .dark: .dark
+        case .dark, .black: .dark
         case .system: nil
         }
     }
 }
 
 /// The chosen theme and color mode, saved on this device. Views that read
-/// `theme` redraw when it changes.
+/// `theme` redraw when either changes.
 @MainActor @Observable
 public final class ThemeStore {
     /// The app's own look, listed first and used until the person picks another.
     public let house: Theme
     public let groups: [ThemeGroup]
-    public private(set) var theme: Theme
+    /// The chosen theme, as it should be drawn: in Black mode its dark
+    /// backgrounds are true black (see `Theme.black`).
+    public var theme: Theme { colorMode == .black ? chosen.black : chosen }
+    private var chosen: Theme
     public var colorMode: ColorMode {
         didSet { defaults.set(colorMode.rawValue, forKey: Self.colorModeKey) }
     }
@@ -55,12 +61,12 @@ public final class ThemeStore {
         self.defaults = defaults
         let saved = defaults.string(forKey: Self.themeKey)
         // A theme that's gone from the list falls back to the app's own look.
-        theme = groups.flatMap(\.themes).first { $0.id == saved } ?? house
+        chosen = groups.flatMap(\.themes).first { $0.id == saved } ?? house
         colorMode = defaults.string(forKey: Self.colorModeKey).flatMap(ColorMode.init) ?? .system
     }
 
     public func select(_ theme: Theme) {
-        self.theme = theme
+        chosen = theme
         defaults.set(theme.id, forKey: Self.themeKey)
     }
 

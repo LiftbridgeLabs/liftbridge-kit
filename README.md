@@ -4,9 +4,9 @@ Shared code for Liftbridge Labs apps. Each library is a separate Swift package p
 
 | Library | What it does |
 | --- | --- |
-| `LiftbridgeThemes` | Light / Dark / System color mode and a picker of named color themes, grouped (solid colors, two-tone, timeless, color vision), with seasonal sets that appear in season marked "New". Every theme is tuned for light and dark mode so text and buttons stay readable. |
+| `LiftbridgeThemes` | Light / Dark / Black / System color mode (Black is true black for OLED screens, with any theme) and a picker of named color themes, grouped (solid colors, two-tone, timeless, color vision), with seasonal sets that appear in season marked "New". Every theme is tuned for light and dark mode so text and buttons stay readable. |
 
-Requires iOS 18 (macOS 15 for running the tests).
+Requires iOS 18 or tvOS 18 (macOS 15 for running the tests). `ThemePicker` is for iPhone, iPad and Mac; a TV app builds its own picker for the remote from `ThemeStore` (`visibleGroups(on:)`, `select(_:)`, `colorMode`) and `Swatch.gradient(for:)`.
 
 ## Add it to an app
 
@@ -57,7 +57,7 @@ Add the same dependency to any extension that compiles the file holding the app'
    }
    ```
 
-2. **Read colors from the chosen theme.** A view that reads one redraws when the theme changes, with no restart.
+2. **Read colors from `store.theme.palette`.** A view that reads one redraws when the theme or color mode changes, with no restart. In Black mode `store.theme` is already the black version of the chosen theme (`Theme.black`), so there's nothing extra to do for it.
 
    ```swift
    @MainActor
