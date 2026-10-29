@@ -1,0 +1,31 @@
+# Standard security scans (Jason's Rule #2). The scans themselves live in
+# LiftbridgeLabs/.github, .github/workflows/security-scan.yml. This repo has
+# no third-party dependencies (Swift packages only use Apple's frameworks), so
+# the secret scan is the one that applies; add npm-dirs or pip-requirements
+# here if that changes.
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Mondays, so new advisories against unchanged dependencies are seen.
+    - cron: "23 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      test-alert:
+        description: "Send a test alert (checks that scan failures reach the alerts channel)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    uses: LiftbridgeLabs/.github/.github/workflows/security-scan.yml@main
+    with:
+      test-alert: ${{ inputs.test-alert == true }}
+    secrets:
+      DISCORD_WEBHOOK: ${{ secrets.ALERTS_DISCORD_WEBHOOK }}
