@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 (Oct 30, 2026)
+
+- **Gradient backgrounds.** Each palette has `canvasEnd`, where the screen's background gradient ends, and `canvasGradient` (SwiftUI), which fades `canvas` to `canvasEnd` from top leading to bottom trailing. Two-tone themes fade between their two colors; one-color themes fade to a deeper version of their color; Black mode stays flat black. Text, accent and "done" colors are tested for contrast on both ends.
+- To use it, draw full-screen backgrounds with `.background(palette.canvasGradient)` instead of `palette.canvas.color`. Apps that don't change anything keep a flat background.
+- An app's own palette can pass `canvasEnd:` to `Palette(...)`; leaving it out keeps the background flat.
+- The theme picker and the gallery (`swift run Gallery`) show the gradients.
+
 ## 2.0.1 (Oct 29, 2026)
 
 - **Black is blacker.** Cards, chips and borders in Black mode are neutral #090909, #131313 and #222222 (no theme tint), on the #000000 canvas.

@@ -8,7 +8,7 @@ import LiftbridgeThemes
 //   swift run Gallery out.html   # writes it somewhere else
 
 let roles: [(String, KeyPath<Palette, Shade>)] = [
-    ("accent", \.accent), ("onAccent", \.onAccent), ("canvas", \.canvas), ("card", \.card), ("chip", \.chip),
+    ("accent", \.accent), ("onAccent", \.onAccent), ("canvas", \.canvas), ("canvasEnd", \.canvasEnd), ("card", \.card), ("chip", \.chip),
     ("hairline", \.hairline), ("ink", \.ink), ("muted", \.muted), ("success", \.success),
 ]
 

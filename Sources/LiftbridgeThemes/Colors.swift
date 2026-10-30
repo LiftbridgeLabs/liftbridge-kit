@@ -28,6 +28,14 @@ extension Shade {
     }
 }
 
+extension Palette {
+    /// The screen's background: `canvas` fading to `canvasEnd`, top leading to
+    /// bottom trailing (flat when they're the same, and in Black mode).
+    public var canvasGradient: LinearGradient {
+        LinearGradient(colors: [canvas.color, canvasEnd.color], startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+}
+
 extension Swatch {
     /// The swatch as drawn on a theme's card, for an app's own picker.
     public func gradient(for scheme: ColorScheme) -> LinearGradient {

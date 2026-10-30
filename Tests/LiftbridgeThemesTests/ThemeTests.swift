@@ -45,7 +45,7 @@ private func date(_ month: Int, _ day: Int) -> Date {
     func everyThemeIsReadable(_ theme: Theme) {
         let p = theme.palette
         for (mode, pick) in [("light", \Shade.light), ("dark", \Shade.dark)] {
-            let backgrounds = [p.canvas, p.card, p.chip].map { $0[keyPath: pick] }
+            let backgrounds = [p.canvas, p.canvasEnd, p.card, p.chip].map { $0[keyPath: pick] }
             for background in backgrounds {
                 for (role, shade) in [("accent", p.accent), ("ink", p.ink), ("muted", p.muted), ("success", p.success)] {
                     let ratio = shade[keyPath: pick].contrast(with: background)
@@ -61,7 +61,7 @@ private func date(_ month: Int, _ day: Int) -> Date {
     @Test(arguments: allThemes + [house])
     func everyThemeIsReadableOnBlack(_ theme: Theme) {
         let p = theme.black.palette
-        #expect(p.canvas.dark == .black)
+        #expect(p.canvas.dark == .black && p.canvasEnd.dark == .black)
         #expect(p.card.dark == RGB(0x090909) && p.chip.dark == RGB(0x131313))
         #expect(p.canvas.light == theme.palette.canvas.light)
         for background in [p.canvas, p.card, p.chip].map(\.dark) {
@@ -119,6 +119,15 @@ private func date(_ month: Int, _ day: Int) -> Date {
         let black = Theme(id: "odd", name: "Odd", swatch: house.swatch, palette: palette).black.palette
         #expect(black.accent.dark.contrast(with: .black) >= 4.5)
         #expect(black.onAccent.dark.contrast(with: black.accent.dark) >= 4.5)
+    }
+
+    @Test func twoToneThemesFadeBetweenTheirColors() {
+        let daydream = ThemeGroup.twoTone.themes.first { $0.id == "daydream" }!.palette
+        // Pink tint to sky-blue accent: the two ends differ in hue, not just lightness.
+        let (start, end) = (daydream.canvas.light.oklch.hue, daydream.canvasEnd.light.oklch.hue)
+        #expect(abs(start - end) > 1)
+        let plain = house.palette
+        #expect(plain.canvasEnd == plain.canvas)
     }
 
     @Test func seasonsCoverTheirMonths() {

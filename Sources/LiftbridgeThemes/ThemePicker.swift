@@ -128,7 +128,7 @@ public struct ThemePicker: View {
 
     // Drawn in the theme's own colors, so Black mode is pure black here too.
     private var palette: Palette { store.theme.palette }
-    private var background: Color { palette.canvas.color }
+    private var background: LinearGradient { palette.canvasGradient }
     private var cardFill: Color { palette.card.color }
 }
 

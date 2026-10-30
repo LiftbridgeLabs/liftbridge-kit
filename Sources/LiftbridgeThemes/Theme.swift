@@ -21,8 +21,12 @@ public struct Palette: Hashable, Sendable {
     public var accent: Shade
     /// Text and icons drawn on an accent fill.
     public var onAccent: Shade
-    /// The screen behind everything.
+    /// The screen behind everything; with `canvasEnd`, the start of its
+    /// gradient (top leading).
     public var canvas: Shade
+    /// Where the screen's gradient ends (bottom trailing). The same as
+    /// `canvas` for a flat background.
+    public var canvasEnd: Shade
     /// Cards and rows on the canvas.
     public var card: Shade
     /// Small filled shapes: tags, chips.
@@ -37,10 +41,11 @@ public struct Palette: Hashable, Sendable {
     public var success: Shade
 
     public init(accent: Shade, onAccent: Shade, canvas: Shade, card: Shade, chip: Shade,
-                hairline: Shade, ink: Shade, muted: Shade, success: Shade) {
+                hairline: Shade, ink: Shade, muted: Shade, success: Shade, canvasEnd: Shade? = nil) {
         self.accent = accent
         self.onAccent = onAccent
         self.canvas = canvas
+        self.canvasEnd = canvasEnd ?? canvas
         self.card = card
         self.chip = chip
         self.hairline = hairline
@@ -165,8 +170,10 @@ extension Palette {
     /// and chips carry the theme's color clearly enough to tell themes apart
     /// at a glance; cards stay close to white (or dark gray) so photos and
     /// text stay the focus.
-    private static let surfaces: (canvas: Recipe, card: Recipe, chip: Recipe, hairline: Recipe) = (
+    private static let surfaces: (canvas: Recipe, canvasEnd: Recipe, card: Recipe, chip: Recipe, hairline: Recipe) = (
         canvas: Recipe(light: (0.95, 0.045), dark: (0.2, 0.06)),
+        // The gradient's far end: a little deeper, in the theme's second color.
+        canvasEnd: Recipe(light: (0.92, 0.065), dark: (0.17, 0.075)),
         card: Recipe(light: (0.99, 0.014), dark: (0.255, 0.06)),
         chip: Recipe(light: (0.905, 0.07), dark: (0.3, 0.07)),
         hairline: Recipe(light: (0.86, 0.06), dark: (0.36, 0.06))
@@ -202,9 +209,14 @@ extension Palette {
         let wash = tint.oklch
         let strength = neutral ? 0 : min(wash.chroma / fullTint, 1)
         let canvas = surfaces.canvas.shade(hue: wash.hue, strength: strength)
+        // Two-tone themes fade from the tint to the accent's color; one-color
+        // themes fade to a deeper version of the same color.
+        let second = accent.oklch
+        let canvasEnd = neutral ? canvas
+            : surfaces.canvasEnd.shade(hue: second.hue, strength: min(second.chroma / fullTint, 1))
         let card = surfaces.card.shade(hue: wash.hue, strength: strength)
         let chip = surfaces.chip.shade(hue: wash.hue, strength: strength)
-        let backgrounds = [canvas, card, chip]
+        let backgrounds = [canvas, canvasEnd, card, chip]
         // Light mode: darkened until it reads on every background (and white
         // reads on it). Dark mode: no darker than a soft pastel, lightened
         // until it reads. Given colors only move if they wouldn't read.
@@ -223,7 +235,8 @@ extension Palette {
             hairline: surfaces.hairline.shade(hue: wash.hue, strength: strength),
             ink: ink,
             muted: text.muted.shade(hue: wash.hue, strength: strength),
-            success: readable(success ?? defaultSuccess)
+            success: readable(success ?? defaultSuccess),
+            canvasEnd: canvasEnd
         )
     }
 
@@ -233,6 +246,7 @@ extension Palette {
     var black: Palette {
         var palette = self
         palette.canvas.dark = .black
+        palette.canvasEnd.dark = .black
         palette.card.dark = Self.blackSurfaces.card
         palette.chip.dark = Self.blackSurfaces.chip
         palette.hairline.dark = Self.blackSurfaces.hairline

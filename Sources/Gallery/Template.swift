@@ -66,7 +66,7 @@ let template = #"""
   </div>
 </header>
 <main id="groups"></main>
-<footer>Each preview uses the theme's real colors: background, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color to copy its code. Seasonal groups show in apps only during their dates.</footer>
+<footer>Each preview uses the theme's real colors: the background gradient, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color to copy its code. Seasonal groups show in apps only during their dates.</footer>
 <script>
 const groups = __DATA__;
 const names = { light: "Light", dark: "Dark", black: "Black" };
@@ -81,7 +81,7 @@ function el(tag, cls, text) {
 
 function screen(c) {
   const s = el("div", "screen");
-  s.style.background = c.canvas;
+  s.style.background = `linear-gradient(135deg, ${c.canvas}, ${c.canvasEnd})`;
   const card = el("div", "card");
   card.style.background = c.card; card.style.borderColor = c.hairline;
   const title = el("b", null, "Lemon chicken"); title.style.color = c.ink;
@@ -97,7 +97,7 @@ function screen(c) {
   return s;
 }
 
-const roles = [["accent", "accent"], ["onAccent", "on accent"], ["canvas", "background"], ["card", "card"],
+const roles = [["accent", "accent"], ["onAccent", "on accent"], ["canvas", "background"], ["canvasEnd", "background end"], ["card", "card"],
                ["chip", "tag"], ["hairline", "border"], ["ink", "text"], ["muted", "secondary"], ["success", "done"]];
 
 function hexes(c) {
