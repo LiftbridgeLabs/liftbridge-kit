@@ -153,8 +153,8 @@ public struct ThemeGroup: Identifiable, Hashable, Sendable {
 
 extension Theme {
     /// The theme for Black mode: the dark-mode canvas goes true black (OLED
-    /// pixels off); cards, chips and borders sit just above black with a hint
-    /// of the theme's color, so they still stand apart. Light mode is unchanged.
+    /// pixels off); cards, chips and borders sit just above black (#090909,
+    /// #131313, #222222) so they still stand apart. Light mode is unchanged.
     public var black: Theme {
         Theme(id: id, name: name, swatch: swatch, palette: palette.black)
     }
@@ -171,10 +171,10 @@ extension Palette {
         chip: Recipe(light: (0.905, 0.07), dark: (0.3, 0.07)),
         hairline: Recipe(light: (0.86, 0.06), dark: (0.36, 0.06))
     )
-    /// Black mode's surfaces: the canvas is #000000 and these match #0A0A0A,
-    /// #141414 and #262626 in lightness, tinted with the theme's hue.
-    private static let blackSurfaces: (card: (Double, Double), chip: (Double, Double), hairline: (Double, Double)) = (
-        card: (0.145, 0.03), chip: (0.185, 0.035), hairline: (0.27, 0.035)
+    /// Black mode's surfaces, untinted so Black stays as black as it can
+    /// while cards still stand apart from the #000000 canvas.
+    private static let blackSurfaces: (card: RGB, chip: RGB, hairline: RGB) = (
+        card: RGB(0x090909), chip: RGB(0x131313), hairline: RGB(0x222222)
     )
     private static let text: (ink: Recipe, muted: Recipe) = (
         ink: Recipe(light: (0.23, 0.02), dark: (0.95, 0.015)),
@@ -231,16 +231,11 @@ extension Palette {
     /// colors keep their dark-mode values, lightened only where one wouldn't
     /// read on the darker surfaces (an app's own palette can be anything).
     var black: Palette {
-        let lch = card.dark.oklch
-        let strength = min(lch.chroma / Self.blackSurfaces.card.1, 1)
-        func surface(_ recipe: (Double, Double)) -> RGB {
-            RGB(OKLCH(lightness: recipe.0, chroma: recipe.1 * strength, hue: lch.hue))
-        }
         var palette = self
         palette.canvas.dark = .black
-        palette.card.dark = surface(Self.blackSurfaces.card)
-        palette.chip.dark = surface(Self.blackSurfaces.chip)
-        palette.hairline.dark = surface(Self.blackSurfaces.hairline)
+        palette.card.dark = Self.blackSurfaces.card
+        palette.chip.dark = Self.blackSurfaces.chip
+        palette.hairline.dark = Self.blackSurfaces.hairline
         let backgrounds = [palette.canvas.dark, palette.card.dark, palette.chip.dark]
         for role in [\Palette.ink, \.muted, \.success] {
             palette[keyPath: role].dark = Self.tuned(palette[keyPath: role].dark, on: backgrounds, step: 0.005)

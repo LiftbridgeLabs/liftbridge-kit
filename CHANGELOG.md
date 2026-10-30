@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1 (Oct 29, 2026)
+
+- **Black is blacker.** Cards, chips and borders in Black mode are neutral #090909, #131313 and #222222 (no theme tint), on the #000000 canvas.
+- **The picker draws in the theme's own colors** (canvas, card, border and text colors) instead of the system's gray backgrounds, so Black is pure black in the picker too, and a light theme tints it.
+
 ## 2.0.0 (Oct 29, 2026)
 
 **To update:** change the package requirement to `from: 2.0.0`. If the app switches over every `ColorMode` case, add `.black`; apps that only use `colorMode.colorScheme` need no other change.

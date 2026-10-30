@@ -56,7 +56,7 @@ public struct ThemePicker: View {
                                         @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Text(title).font(.headline)
+                Text(title).font(.headline).foregroundStyle(palette.ink.color)
                 if let badge {
                     Text(badge)
                         .font(.caption.weight(.semibold))
@@ -81,7 +81,7 @@ public struct ThemePicker: View {
                 Text(mode.title).lineLimit(1).minimumScaleFactor(0.8)
             }
             .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.primary)
+            .foregroundStyle(palette.ink.color)
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, minHeight: 56)
             .background(cardFill, in: shape)
@@ -102,11 +102,11 @@ public struct ThemePicker: View {
                     .frame(width: 36, height: 36)
                 Text(theme.name)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(palette.ink.color)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if locked {
-                    Image(systemName: "lock.fill").imageScale(.small).foregroundStyle(.secondary)
+                    Image(systemName: "lock.fill").imageScale(.small).foregroundStyle(palette.muted.color)
                 }
             }
             .padding(12)
@@ -123,24 +123,13 @@ public struct ThemePicker: View {
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 12, style: .continuous) }
 
     private func outline(_ selected: Bool) -> some View {
-        shape.strokeBorder(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(.separator), lineWidth: selected ? 2.5 : 1)
+        shape.strokeBorder(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(palette.hairline.color), lineWidth: selected ? 2.5 : 1)
     }
 
-    private var background: Color {
-        #if os(iOS)
-        Color(uiColor: .systemGroupedBackground)
-        #else
-        Color(nsColor: .windowBackgroundColor)
-        #endif
-    }
-
-    private var cardFill: Color {
-        #if os(iOS)
-        Color(uiColor: .secondarySystemGroupedBackground)
-        #else
-        Color(nsColor: .controlBackgroundColor)
-        #endif
-    }
+    // Drawn in the theme's own colors, so Black mode is pure black here too.
+    private var palette: Palette { store.theme.palette }
+    private var background: Color { palette.canvas.color }
+    private var cardFill: Color { palette.card.color }
 }
 
 #endif

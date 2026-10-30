@@ -62,6 +62,7 @@ private func date(_ month: Int, _ day: Int) -> Date {
     func everyThemeIsReadableOnBlack(_ theme: Theme) {
         let p = theme.black.palette
         #expect(p.canvas.dark == .black)
+        #expect(p.card.dark == RGB(0x090909) && p.chip.dark == RGB(0x131313))
         #expect(p.canvas.light == theme.palette.canvas.light)
         for background in [p.canvas, p.card, p.chip].map(\.dark) {
             for (role, shade) in [("accent", p.accent), ("ink", p.ink), ("muted", p.muted), ("success", p.success)] {
