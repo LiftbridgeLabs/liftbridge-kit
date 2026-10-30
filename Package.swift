@@ -13,5 +13,7 @@ let package = Package(
     targets: [
         .target(name: "LiftbridgeThemes"),
         .testTarget(name: "LiftbridgeThemesTests", dependencies: ["LiftbridgeThemes"]),
+        // `swift run Gallery`: a page showing every theme's colors (not shipped to apps).
+        .executableTarget(name: "Gallery", dependencies: ["LiftbridgeThemes"]),
     ]
 )

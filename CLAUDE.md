@@ -22,7 +22,9 @@ tokens, test data, or app plans, and don't name an app that isn't in the store.
 4. Commit (Rule #1: no AI attribution), push to `main`, then tag the release
    with a plain version (`git tag 1.1.0 && git push origin 1.1.0`, no "v").
    Apps resolve by tag, so an untagged change never reaches them.
-5. Tell Jason which apps should update to pick it up.
+5. Run `swift run Gallery` so Jason's theme gallery (gallery.html) shows the
+   release.
+6. Tell Jason which apps should update to pick it up.
 
 ## Seasons
 

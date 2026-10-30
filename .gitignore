@@ -2,3 +2,5 @@
 .build/
 .swiftpm/
 xcuserdata/
+# swift run Gallery output
+gallery.html

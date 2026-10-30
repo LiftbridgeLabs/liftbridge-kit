@@ -108,6 +108,14 @@ A theme's `id` is saved on people's devices and never changes once released; its
 
 New themes and seasons reach people only in an app build that includes the newer version. To pick one up, update the package in the app (Xcode: File > Packages > Update to Latest Package Versions; command line: `xcodebuild -resolvePackageDependencies` after removing the app's `Package.resolved` pin for liftbridge-kit), build, and check Settings > Theme.
 
+## See every theme
+
+```sh
+swift run Gallery
+```
+
+Writes `gallery.html` (not committed) and opens it: every theme as a small mock screen in Light, Dark and Black mode, with its color codes, built from the same palettes apps use. Run it again after changing themes.
+
 ## Tests
 
 ```sh
