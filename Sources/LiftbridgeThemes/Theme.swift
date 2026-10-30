@@ -21,10 +21,10 @@ public struct Palette: Hashable, Sendable {
     public var accent: Shade
     /// Text and icons drawn on an accent fill.
     public var onAccent: Shade
-    /// The screen behind everything; with `canvasEnd`, the start of its
-    /// gradient (top leading).
+    /// The screen behind everything; with `canvasEnd`, the top of its
+    /// gradient.
     public var canvas: Shade
-    /// Where the screen's gradient ends (bottom trailing). The same as
+    /// Where the screen's gradient ends (the bottom). The same as
     /// `canvas` for a flat background.
     public var canvasEnd: Shade
     /// Cards and rows on the canvas.

@@ -29,10 +29,11 @@ extension Shade {
 }
 
 extension Palette {
-    /// The screen's background: `canvas` fading to `canvasEnd`, top leading to
-    /// bottom trailing (flat when they're the same, and in Black mode).
+    /// The screen's background: `canvas` at the top fading to `canvasEnd` at
+    /// the bottom (flat when they're the same, and in Black mode). Top to
+    /// bottom, so a bar pinned at the top drawn in `canvas` matches it.
     public var canvasGradient: LinearGradient {
-        LinearGradient(colors: [canvas.color, canvasEnd.color], startPoint: .topLeading, endPoint: .bottomTrailing)
+        LinearGradient(colors: [canvas.color, canvasEnd.color], startPoint: .top, endPoint: .bottom)
     }
 }
 

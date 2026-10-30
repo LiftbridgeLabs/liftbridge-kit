@@ -81,7 +81,7 @@ function el(tag, cls, text) {
 
 function screen(c) {
   const s = el("div", "screen");
-  s.style.background = `linear-gradient(135deg, ${c.canvas}, ${c.canvasEnd})`;
+  s.style.background = `linear-gradient(180deg, ${c.canvas}, ${c.canvasEnd})`;
   const card = el("div", "card");
   card.style.background = c.card; card.style.borderColor = c.hairline;
   const title = el("b", null, "Lemon chicken"); title.style.color = c.ink;
