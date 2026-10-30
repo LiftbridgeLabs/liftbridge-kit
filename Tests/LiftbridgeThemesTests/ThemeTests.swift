@@ -157,6 +157,21 @@ private func date(_ month: Int, _ day: Int) -> Date {
         #expect(house.palette.chrome == house.palette.canvas && house.palette.onChrome == house.palette.ink)
     }
 
+    /// A frame's far end is the same color, a little deeper or equal, never
+    /// a second hue (a short band would read as a stripe).
+    @Test(arguments: allThemes)
+    func frameEndIsTheSameColor(_ theme: Theme) {
+        let p = theme.palette
+        for pick in [\Shade.light, \Shade.dark] {
+            let (top, end) = (p.chrome[keyPath: pick].oklch, p.chromeEnd[keyPath: pick].oklch)
+            #expect(end.lightness <= top.lightness + 0.001, "\(theme.name): frame end is lighter")
+            if min(top.chroma, end.chroma) > 0.03 {
+                let turn = abs(remainder(top.hue - end.hue, 2 * .pi))
+                #expect(turn < 0.15, "\(theme.name): frame end turns \(turn) rad of hue")
+            }
+        }
+    }
+
     @Test func frameTextFallsBackToBlack() {
         // A gray text color can't reach 4.5:1 on a white frame; black can.
         var palette = house.palette

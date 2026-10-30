@@ -72,7 +72,7 @@ Add the same dependency to any extension that compiles the file holding the app'
 
    Draw full-screen backgrounds with the theme's gradient: `.background(ThemeStore.app.theme.palette.canvasGradient)` (two-tone themes fade between their colors; Black stays flat black).
 
-   Draw the app's frame (the header above lists, the tab bar, toolbars) with `palette.chromeGradient` and put `onChrome` text and icons on it; a selected tab or row on the frame is `selection` with `onSelection` text. Cards and lists stay on `canvas` and `card`, so content stays calm. To give the app's own look a frame, build its palette with `.withFrame(from: swatch)`.
+   Draw the app's frame (the header above lists, the tab bar, toolbars) in flat `palette.chrome`, with `onChrome` text and icons on it, and put `FrameFade(palette)` (36 pt by default) right under a header band so it eases into the content instead of ending in a hard line. A selected tab or row on the frame is `selection` with `onSelection` text. Cards and lists stay on `canvas` and `card`, so content stays calm. `chromeEnd` is a slightly deeper shade of `chrome` for a tab bar or a tall frame such as a sidebar (`chromeGradient`); don't use it for the bottom of a short band. To give the app's own look a frame, build its palette with `.withFrame(from: swatch)`.
 
    Use `onAccent` for text and icons drawn on an accent fill, including `.borderedProminent` buttons (`.foregroundStyle(Color.onAccent)`): some themes have pale accents in dark mode, where white text can't be read.
 

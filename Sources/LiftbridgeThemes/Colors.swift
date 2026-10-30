@@ -38,10 +38,38 @@ extension Palette {
 }
 
 extension Palette {
-    /// The app's frame (header above lists, tab bar, toolbars): `chrome` at
-    /// the top fading to `chromeEnd` at the bottom.
+    /// `chrome` deepening to `chromeEnd`, top to bottom: for a tall frame such
+    /// as a sidebar. A header band is flat `chrome` with a `FrameFade` below.
     public var chromeGradient: LinearGradient {
         LinearGradient(colors: [chrome.color, chromeEnd.color], startPoint: .top, endPoint: .bottom)
+    }
+
+    /// `chrome` fading to clear, top to bottom: put it under a header band so
+    /// the frame eases into the content instead of ending in a hard line.
+    public var frameFade: LinearGradient {
+        LinearGradient(colors: [chrome.color, chrome.color.opacity(0)], startPoint: .top, endPoint: .bottom)
+    }
+}
+
+/// The soft bottom edge of a header band: the frame's color fading to clear
+/// over the content. Place it right below a band of flat `chrome`, for
+/// example `.safeAreaInset(edge: .top) { header }` then `FrameFade(palette)`
+/// overlaid at the band's bottom.
+public struct FrameFade: View {
+    private let palette: Palette
+    private let height: CGFloat
+
+    public init(_ palette: Palette, height: CGFloat = 36) {
+        self.palette = palette
+        self.height = height
+    }
+
+    public var body: some View {
+        Rectangle()
+            .fill(palette.frameFade)
+            .frame(height: height)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 }
 

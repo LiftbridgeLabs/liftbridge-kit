@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0 (Oct 30, 2026)
+
+- **`FrameFade`**: the frame's color fading to clear (36 pt by default), to put right under a header band so it eases into the content instead of ending in a hard line. Also as a gradient: `palette.frameFade`. The README now describes the frame as flat `chrome` plus `FrameFade`.
+- **`chromeEnd` is a slightly deeper shade of `chrome`,** never the swatch's second color, which read as a stripe of another color under a short band (gold over red in some themes). It's for a tab bar or a tall frame such as a sidebar (`chromeGradient`). A test checks that every frame's end keeps its color.
+
 ## 2.2.0 (Oct 30, 2026)
 
 - **A strong frame color for every theme.** `Palette.chrome` and `chromeEnd` (with `chromeGradient` in SwiftUI) are the theme's bold color for the app's frame: the header above lists, tab bars and toolbars, the way a sidebar carries the theme in a desktop chat app. Light mode uses the theme's bright pair, dark mode its deep pair, Black mode pure black. `onChrome` is the text and icon color on it (white or dark), tested at 4.5:1 on both ends.

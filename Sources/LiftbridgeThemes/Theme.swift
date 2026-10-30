@@ -40,9 +40,11 @@ public struct Palette: Hashable, Sendable {
     /// Checked off, finished, saved.
     public var success: Shade
     /// The app's frame (the header above lists, tab bar, toolbars): the
-    /// theme's strong color, top of its gradient. Content stays on `canvas`.
+    /// theme's strong color. Draw it flat, with `FrameFade` easing its bottom
+    /// edge into the content; content stays on `canvas`.
     public var chrome: Shade
-    /// Where the frame's gradient ends (the bottom).
+    /// A slightly deeper shade of `chrome`, for depth in a tall frame (a
+    /// sidebar, `chromeGradient`) or a tab bar set apart from the header.
     public var chromeEnd: Shade
     /// Text and icons on the frame.
     public var onChrome: Shade
@@ -263,14 +265,20 @@ extension Palette {
         )
     }
 
-    /// The palette with a strong frame in the swatch's colors, as a desktop chat app paints
-    /// its sidebar: the bright pair in light mode, the deep pair in dark mode.
+    /// The palette with a strong frame in the swatch's color, as a desktop chat app paints
+    /// its sidebar: the bright swatch in light mode, the deep one in dark mode.
     /// The frame's text is white or the palette's dark text, whichever reads,
     /// and the frame colors move away from it where needed to reach 4.5:1.
     public func withFrame(from swatch: Swatch) -> Palette {
         var palette = self
         for (mode, stops) in [(\Shade.light, swatch.light), (\Shade.dark, swatch.dark)] {
-            guard let top = stops.first, let bottom = stops.last else { continue }
+            guard let top = stops.first else { continue }
+            // The frame's far end is a slightly deeper shade of the same color,
+            // never the swatch's second color: in a short band a second hue
+            // reads as a stripe.
+            var deeper = top.oklch
+            deeper.lightness -= 0.06
+            let bottom = RGB(deeper)
             let whiteScore = min(RGB.white.contrast(with: top), RGB.white.contrast(with: bottom))
             let inkScore = min(ink.light.contrast(with: top), ink.light.contrast(with: bottom))
             // White text darkens the frame until it reads, which always works.

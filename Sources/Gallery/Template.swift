@@ -87,7 +87,7 @@ function screen(c) {
   const wrap = el("div", "device");
   // The frame: header with a title and tabs, one selected.
   const frame = el("div", "frame");
-  frame.style.background = `linear-gradient(180deg, ${c.chrome}, ${c.chromeEnd})`;
+  frame.style.background = c.chrome;
   frame.style.color = c.onChrome;
   const heading = el("b", null, "Recipes");
   const tabs = el("div", "row");
@@ -96,7 +96,8 @@ function screen(c) {
   tabs.append(on, off);
   frame.append(heading, tabs);
   const s = el("div", "screen");
-  s.style.background = `linear-gradient(180deg, ${c.canvas}, ${c.canvasEnd})`;
+  // The frame's fade into the content, over the background gradient.
+  s.style.background = `linear-gradient(180deg, ${c.chrome}, ${c.chrome}00 22px), linear-gradient(180deg, ${c.canvas}, ${c.canvasEnd})`;
   const card = el("div", "card");
   card.style.background = c.card; card.style.borderColor = c.hairline;
   const title = el("b", null, "Lemon chicken"); title.style.color = c.ink;
