@@ -10,6 +10,8 @@ import LiftbridgeThemes
 let roles: [(String, KeyPath<Palette, Shade>)] = [
     ("accent", \.accent), ("onAccent", \.onAccent), ("canvas", \.canvas), ("canvasEnd", \.canvasEnd), ("card", \.card), ("chip", \.chip),
     ("hairline", \.hairline), ("ink", \.ink), ("muted", \.muted), ("success", \.success),
+    ("chrome", \.chrome), ("chromeEnd", \.chromeEnd), ("onChrome", \.onChrome), ("selection", \.selection),
+    ("onSelection", \.onSelection),
 ]
 
 @MainActor func colors(_ palette: Palette, _ mode: KeyPath<Shade, RGB>) -> [String: String] {

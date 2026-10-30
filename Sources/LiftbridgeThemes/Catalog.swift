@@ -6,7 +6,7 @@ import Foundation
 
 extension ThemeGroup {
     /// Every group, in picker order. An app adds its own look in front.
-    public static let shared: [ThemeGroup] = [halloween, thanksgiving, holidays, solid, twoTone, timeless, colorVision]
+    public static let shared: [ThemeGroup] = [halloween, thanksgiving, holidays, solid, twoTone, timeless, richTones, colorVision]
 
     public static let halloween = ThemeGroup(id: "halloween", title: "Halloween", themes: [
         Theme("ooze", "Ooze", swatch: Swatch((0x6CB953, 0x67AC53)), accent: 0x6AB253),
@@ -97,6 +97,59 @@ extension ThemeGroup {
               accent: 0xE79E96, tint: 0xF4D4D3),
         Theme("tweed", "Tweed", swatch: Swatch((0x315173, 0x473C19), dark: (0x12202D, 0x5D481E)),
               accent: 0x315173, tint: 0x473C19),
+    ])
+
+    /// Hand-picked mid-tone backgrounds (cream, slate, deep teal) rather than
+    /// near-white and near-black, each with a strong frame.
+    public static let richTones = ThemeGroup(id: "rich-tones", title: "Rich tones", themes: [
+        Theme(id: "solstice", name: "Solstice", swatch: Swatch((0x0E4653, 0x073642), dark: (0x0E4653, 0x073642)),
+              palette: Palette.given(
+                  canvas: Shade(0xFDF6E3, 0x002B36), card: Shade(0xFFFBF0, 0x04303C), chip: Shade(0xEEE8D5, 0x073642),
+                  hairline: Shade(0xE0D8BF, 0x0E4653), ink: Shade(0x073642, 0xEEE8D5), muted: Shade(0x52646B, 0xA2AEAE),
+                  accent: Shade(0x1C669A, 0x32BFB4), onAccent: Shade(0xFFFFFF, 0x00252E))
+                  .withFrame(from: Swatch((0x0E4653, 0x073642), dark: (0x0E4653, 0x073642)))),
+        Theme(id: "campfire", name: "Campfire", swatch: Swatch((0xD65D0E, 0xAF3A03), dark: (0x5A3A22, 0x3C3836)),
+              palette: Palette.given(
+                  canvas: Shade(0xFBF1C7, 0x282828), card: Shade(0xFDF6DA, 0x32302F), chip: Shade(0xEBDBB2, 0x3C3836),
+                  hairline: Shade(0xE0D0A4, 0x423D38), ink: Shade(0x3C3836, 0xEBDBB2), muted: Shade(0x64594D, 0xB9AD9C),
+                  accent: Shade(0xA33603, 0xFABD2F), onAccent: Shade(0xFFFFFF, 0x282010))
+                  .withFrame(from: Swatch((0xD65D0E, 0xAF3A03), dark: (0x5A3A22, 0x3C3836)))),
+        Theme(id: "nightshade", name: "Nightshade", swatch: Swatch((0x6272A4, 0x44475A), dark: (0x44475A, 0x21222C)),
+              palette: Palette.given(
+                  canvas: Shade(0xF7F5FB, 0x282A36), card: Shade(0xFFFFFF, 0x2E3040), chip: Shade(0xE9E4F5, 0x343746),
+                  hairline: Shade(0xDDD6EF, 0x3A3D4E), ink: Shade(0x282A36, 0xF8F8F2), muted: Shade(0x625E7C, 0xA9ADC8),
+                  accent: Shade(0x723FD5, 0xBD93F9), onAccent: Shade(0xFFFFFF, 0x201432))
+                  .withFrame(from: Swatch((0x6272A4, 0x44475A), dark: (0x44475A, 0x21222C)))),
+        Theme(id: "woodland", name: "Woodland", swatch: Swatch((0x2A6F46, 0x1F4D33), dark: (0x1E3A29, 0x0F1411)),
+              palette: Palette.given(
+                  canvas: Shade(0xF5F8F4, 0x141A16), card: Shade(0xFFFFFF, 0x19211B), chip: Shade(0xE3ECE1, 0x202A23),
+                  hairline: Shade(0xD7E0D5, 0x27322A), ink: Shade(0x1F2A22, 0xE2EBE4), muted: Shade(0x57665A, 0x94A599),
+                  accent: Shade(0x2A6F46, 0x58C98A), onAccent: Shade(0xFFFFFF, 0x0A1A10))
+                  .withFrame(from: Swatch((0x2A6F46, 0x1F4D33), dark: (0x1E3A29, 0x0F1411)))),
+        Theme(id: "rosewood", name: "Rosewood", swatch: Swatch((0xA63E64, 0x6E2442), dark: (0x4A2232, 0x2A1A20)),
+              palette: Palette.given(
+                  canvas: Shade(0xFDF7F8, 0x211A1D), card: Shade(0xFFFFFF, 0x281F22), chip: Shade(0xF3E6E9, 0x2F2428),
+                  hairline: Shade(0xECDADF, 0x3A2C31), ink: Shade(0x3B2B30, 0xF0E4E8), muted: Shade(0x775C63, 0xB39AA2),
+                  accent: Shade(0xA63E64, 0xEB6F9B), onAccent: Shade(0xFFFFFF, 0x2A0E18))
+                  .withFrame(from: Swatch((0xA63E64, 0x6E2442), dark: (0x4A2232, 0x2A1A20)))),
+        Theme(id: "fjord", name: "Fjord", swatch: Swatch((0x5E81AC, 0x4C566A), dark: (0x4C566A, 0x3B4252)),
+              palette: Palette.given(
+                  canvas: Shade(0xF8FAFC, 0x2E3440), card: Shade(0xFFFFFF, 0x343B48), chip: Shade(0xE5E9F0, 0x3B4252),
+                  hairline: Shade(0xD6DCE6, 0x3F4757), ink: Shade(0x2E3440, 0xE5E9F0), muted: Shade(0x586374, 0xB2BAC8),
+                  accent: Shade(0x466488, 0x8BC2D1), onAccent: Shade(0xFFFFFF, 0x16202B))
+                  .withFrame(from: Swatch((0x5E81AC, 0x4C566A), dark: (0x4C566A, 0x3B4252)))),
+        Theme(id: "parchment", name: "Parchment", swatch: Swatch((0x8A6A40, 0x5A3E1E), dark: (0x3B3223, 0x17140F)),
+              palette: Palette.given(
+                  canvas: Shade(0xFBF6EC, 0x1D1A15), card: Shade(0xFFFAF1, 0x27231C), chip: Shade(0xF0E6D5, 0x2F2B23),
+                  hairline: Shade(0xE0D3BD, 0x3A342A), ink: Shade(0x33291D, 0xECE3D4), muted: Shade(0x6C5E4A, 0xA99B87),
+                  accent: Shade(0x7F582B, 0xD0A05E), onAccent: Shade(0xFFFFFF, 0x201709))
+                  .withFrame(from: Swatch((0x8A6A40, 0x5A3E1E), dark: (0x3B3223, 0x17140F)))),
+        Theme(id: "slate", name: "Slate", swatch: Swatch((0x2C3A5C, 0x1F2430), dark: (0x22304F, 0x12151B)),
+              palette: Palette.given(
+                  canvas: Shade(0xF7F8FA, 0x171A21), card: Shade(0xFFFFFF, 0x1D212A), chip: Shade(0xE8EAEF, 0x242936),
+                  hairline: Shade(0xDDE0E7, 0x2B303C), ink: Shade(0x1A1E27, 0xE4E7EE), muted: Shade(0x5A6172, 0x98A0B3),
+                  accent: Shade(0x1F56EE, 0x6E95FF), onAccent: Shade(0xFFFFFF, 0x0A1020))
+                  .withFrame(from: Swatch((0x2C3A5C, 0x1F2430), dark: (0x22304F, 0x12151B)))),
     ])
 
     /// Accent and "done" colors that stay easy to tell apart with common

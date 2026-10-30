@@ -39,9 +39,25 @@ public struct Palette: Hashable, Sendable {
     public var muted: Shade
     /// Checked off, finished, saved.
     public var success: Shade
+    /// The app's frame (the header above lists, tab bar, toolbars): the
+    /// theme's strong color, top of its gradient. Content stays on `canvas`.
+    public var chrome: Shade
+    /// Where the frame's gradient ends (the bottom).
+    public var chromeEnd: Shade
+    /// Text and icons on the frame.
+    public var onChrome: Shade
+    /// A selected or highlighted item, like a selected tab or channel on the
+    /// frame: the accent where it stands out from the frame, else a pill in
+    /// `onChrome`.
+    public var selection: Shade
+    /// Text and icons on `selection`.
+    public var onSelection: Shade
 
+    /// Without `chrome`, the frame is the canvas with the main text color on
+    /// it (calm); `withFrame(from:)` gives it a theme's strong color.
     public init(accent: Shade, onAccent: Shade, canvas: Shade, card: Shade, chip: Shade,
-                hairline: Shade, ink: Shade, muted: Shade, success: Shade, canvasEnd: Shade? = nil) {
+                hairline: Shade, ink: Shade, muted: Shade, success: Shade, canvasEnd: Shade? = nil,
+                chrome: Shade? = nil, chromeEnd: Shade? = nil, onChrome: Shade? = nil) {
         self.accent = accent
         self.onAccent = onAccent
         self.canvas = canvas
@@ -52,6 +68,12 @@ public struct Palette: Hashable, Sendable {
         self.ink = ink
         self.muted = muted
         self.success = success
+        self.chrome = chrome ?? canvas
+        self.chromeEnd = chromeEnd ?? chrome ?? canvasEnd ?? canvas
+        self.onChrome = onChrome ?? ink
+        selection = accent
+        onSelection = onAccent
+        chooseSelection()
     }
 }
 
@@ -93,8 +115,8 @@ public struct Theme: Identifiable, Hashable, Sendable {
     init(_ id: String, _ name: String, swatch: Swatch, accent: UInt32, tint: UInt32? = nil,
          accentOverride: Shade? = nil, success: Shade? = nil, neutral: Bool = false) {
         self.init(id: id, name: name, swatch: swatch,
-                  palette: .derived(accent: RGB(accent), tint: RGB(tint ?? accent), accentOverride: accentOverride,
-                                    success: success, neutral: neutral))
+                  palette: Palette.derived(accent: RGB(accent), tint: RGB(tint ?? accent), accentOverride: accentOverride,
+                                           success: success, neutral: neutral).withFrame(from: swatch))
     }
 }
 
@@ -157,9 +179,10 @@ public struct ThemeGroup: Identifiable, Hashable, Sendable {
 }
 
 extension Theme {
-    /// The theme for Black mode: the dark-mode canvas goes true black (OLED
-    /// pixels off); cards, chips and borders sit just above black (#090909,
-    /// #131313, #222222) so they still stand apart. Light mode is unchanged.
+    /// The theme for Black mode: the dark-mode canvas and frame go true black
+    /// (OLED pixels off); cards, chips and borders sit just above black
+    /// (#090909, #131313, #222222) so they still stand apart. Light mode is
+    /// unchanged.
     public var black: Theme {
         Theme(id: id, name: name, swatch: swatch, palette: palette.black)
     }
@@ -240,9 +263,61 @@ extension Palette {
         )
     }
 
+    /// The palette with a strong frame in the swatch's colors, as a desktop chat app paints
+    /// its sidebar: the bright pair in light mode, the deep pair in dark mode.
+    /// The frame's text is white or the palette's dark text, whichever reads,
+    /// and the frame colors move away from it where needed to reach 4.5:1.
+    public func withFrame(from swatch: Swatch) -> Palette {
+        var palette = self
+        for (mode, stops) in [(\Shade.light, swatch.light), (\Shade.dark, swatch.dark)] {
+            guard let top = stops.first, let bottom = stops.last else { continue }
+            let whiteScore = min(RGB.white.contrast(with: top), RGB.white.contrast(with: bottom))
+            let inkScore = min(ink.light.contrast(with: top), ink.light.contrast(with: bottom))
+            // White text darkens the frame until it reads, which always works.
+            // Dark text lightens it, which works only if the text is dark
+            // enough: the palette's own dark text if it gets there, else black.
+            var text = whiteScore >= inkScore ? RGB.white : ink.light
+            var frame = Self.framed(top, bottom, for: text)
+            if text != .white, frame.contains(where: { text.contrast(with: $0) < Self.readable }) {
+                text = .black
+                frame = Self.framed(top, bottom, for: text)
+            }
+            palette.chrome[keyPath: mode] = frame[0]
+            palette.chromeEnd[keyPath: mode] = frame[1]
+            palette.onChrome[keyPath: mode] = text
+        }
+        palette.chooseSelection()
+        return palette
+    }
+
+    /// The frame's two colors moved away from its text until both read.
+    private static func framed(_ top: RGB, _ bottom: RGB, for text: RGB) -> [RGB] {
+        let step = text == .white ? -0.005 : 0.005
+        return [tuned(top, on: [text], step: step), tuned(bottom, on: [text], step: step)]
+    }
+
+    /// The accent marks a selected item where it stands out from the frame
+    /// (3:1, as for any shape); otherwise a pill in the frame's text color,
+    /// with the frame's color as its text.
+    mutating func chooseSelection() {
+        for mode in [\Shade.light, \Shade.dark] {
+            let frame = [chrome[keyPath: mode], chromeEnd[keyPath: mode]]
+            let fill = accent[keyPath: mode]
+            if frame.allSatisfy({ fill.contrast(with: $0) >= 3 }) {
+                selection[keyPath: mode] = fill
+                onSelection[keyPath: mode] = onAccent[keyPath: mode]
+            } else {
+                let pill = onChrome[keyPath: mode]
+                selection[keyPath: mode] = pill
+                onSelection[keyPath: mode] = frame.max { pill.contrast(with: $0) < pill.contrast(with: $1) }!
+            }
+        }
+    }
+
     /// Dark mode on true black (see `Theme.black`). Text, accent and success
     /// colors keep their dark-mode values, lightened only where one wouldn't
     /// read on the darker surfaces (an app's own palette can be anything).
+    /// The frame goes black too, with the main text color on it.
     var black: Palette {
         var palette = self
         palette.canvas.dark = .black
@@ -262,7 +337,36 @@ extension Palette {
             palette.onAccent.dark = [RGB.white, palette.ink.light, .black]
                 .first { $0.contrast(with: fill) >= Self.readable } ?? .black
         }
+        palette.chrome.dark = .black
+        palette.chromeEnd.dark = .black
+        palette.onChrome.dark = palette.ink.dark
+        palette.chooseSelection()
         return palette
+    }
+
+    /// A palette whose content colors are given (for themes with hand-picked,
+    /// often mid-tone backgrounds), with text and accent colors moved only
+    /// where one wouldn't reach 4.5:1 on the backgrounds.
+    static func given(canvas: Shade, card: Shade, chip: Shade, hairline: Shade, ink: Shade, muted: Shade,
+                      accent: Shade, onAccent: Shade) -> Palette {
+        let backgrounds = [canvas, card, chip]
+        func legible(_ shade: Shade) -> Shade {
+            // Lighter text in dark mode, darker in light mode; a dark-mode
+            // background can be mid-tone, so move away from it either way.
+            Shade(light: tuned(shade.light, on: backgrounds.map(\.light), step: -0.005),
+                  dark: tuned(shade.dark, on: backgrounds.map(\.dark), step: 0.005))
+        }
+        let ink = legible(ink)
+        let accent = legible(accent)
+        func onFill(_ fill: RGB, given: RGB) -> RGB {
+            [given, .white, ink.light, .black].first { $0.contrast(with: fill) >= readable } ?? .black
+        }
+        return Palette(
+            accent: accent,
+            onAccent: Shade(light: onFill(accent.light, given: onAccent.light), dark: onFill(accent.dark, given: onAccent.dark)),
+            canvas: canvas, card: card, chip: chip, hairline: hairline, ink: ink, muted: legible(muted),
+            success: legible(defaultSuccess)
+        )
     }
 
     /// The source color moved along lightness only (same hue) until it has

@@ -130,6 +130,43 @@ private func date(_ month: Int, _ day: Int) -> Date {
         #expect(plain.canvasEnd == plain.canvas)
     }
 
+    /// Text on the frame and on a selected item reads in every mode, and a
+    /// selected item stands out from the frame.
+    @Test(arguments: allThemes + [house])
+    func frameAndSelectionAreReadable(_ theme: Theme) {
+        for (mode, p, pick) in [("light", theme.palette, \Shade.light), ("dark", theme.palette, \Shade.dark),
+                                ("black", theme.black.palette, \Shade.dark)] {
+            for end in [p.chrome, p.chromeEnd] {
+                let ratio = p.onChrome[keyPath: pick].contrast(with: end[keyPath: pick])
+                #expect(ratio >= 4.5, "\(theme.name) \(mode): frame text is \(ratio)")
+                let apart = p.selection[keyPath: pick].contrast(with: end[keyPath: pick])
+                #expect(apart >= 3, "\(theme.name) \(mode): selection blends into the frame (\(apart))")
+            }
+            let ratio = p.onSelection[keyPath: pick].contrast(with: p.selection[keyPath: pick])
+            #expect(ratio >= 4.5, "\(theme.name) \(mode): selected text is \(ratio)")
+        }
+    }
+
+    @Test func framesUseTheSwatchAndBlackGoesBlack() {
+        let plum = ThemeGroup.solid.themes.first { $0.id == "plum" }!
+        // Deep purple in light mode, with white text.
+        #expect(plum.palette.onChrome.light == .white)
+        #expect(plum.palette.chrome.light.oklch.chroma > 0.05)
+        #expect(plum.black.palette.chrome.dark == .black && plum.black.palette.chromeEnd.dark == .black)
+        // An app's own palette without a frame keeps a calm one: its canvas.
+        #expect(house.palette.chrome == house.palette.canvas && house.palette.onChrome == house.palette.ink)
+    }
+
+    @Test func frameTextFallsBackToBlack() {
+        // A gray text color can't reach 4.5:1 on a white frame; black can.
+        var palette = house.palette
+        palette.ink.light = RGB(0x808080)
+        let framed = palette.withFrame(from: Swatch((0xFFFFFF, 0xFFFFFF)))
+        for end in [framed.chrome.light, framed.chromeEnd.light] {
+            #expect(framed.onChrome.light.contrast(with: end) >= 4.5)
+        }
+    }
+
     @Test func seasonsCoverTheirMonths() {
         let halloween = ThemeGroup.halloween.season!
         #expect(halloween.contains(date(10, 1)) && halloween.contains(date(10, 31)))

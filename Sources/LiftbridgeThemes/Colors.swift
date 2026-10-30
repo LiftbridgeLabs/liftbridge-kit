@@ -37,6 +37,14 @@ extension Palette {
     }
 }
 
+extension Palette {
+    /// The app's frame (header above lists, tab bar, toolbars): `chrome` at
+    /// the top fading to `chromeEnd` at the bottom.
+    public var chromeGradient: LinearGradient {
+        LinearGradient(colors: [chrome.color, chromeEnd.color], startPoint: .top, endPoint: .bottom)
+    }
+}
+
 extension Swatch {
     /// The swatch as drawn on a theme's card, for an app's own picker.
     public func gradient(for scheme: ColorScheme) -> LinearGradient {

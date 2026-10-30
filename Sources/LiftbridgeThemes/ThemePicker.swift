@@ -10,7 +10,6 @@ public struct ThemePicker: View {
     @Bindable private var store: ThemeStore
     private let allSeasons: Bool
     private let isLocked: (Theme) -> Bool
-    @Environment(\.colorScheme) private var colorScheme
 
     /// `allSeasons` lists every seasonal group (for testers); `isLocked`
     /// shows a lock on themes the app doesn't offer yet.
@@ -94,24 +93,30 @@ public struct ThemePicker: View {
     private func card(_ theme: Theme) -> some View {
         let selected = store.theme.id == theme.id
         let locked = isLocked(theme)
+        // The card is the theme's frame, as the app will show it in this mode.
+        let look = (store.colorMode == .black ? theme.black : theme).palette
         return Button { store.select(theme) } label: {
-            HStack(spacing: 12) {
-                Circle()
-                    .fill(theme.swatch.gradient(for: colorScheme))
-                    .overlay(Circle().strokeBorder(.primary.opacity(0.12)))
-                    .frame(width: 36, height: 36)
+            HStack(spacing: 10) {
                 Text(theme.name)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(palette.ink.color)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if locked {
-                    Image(systemName: "lock.fill").imageScale(.small).foregroundStyle(palette.muted.color)
+                    Image(systemName: "lock.fill").imageScale(.small)
+                } else if selected {
+                    Image(systemName: "checkmark.circle.fill").imageScale(.large)
+                } else {
+                    // The theme's accent, on its own reading surface.
+                    Circle().fill(look.accent.color)
+                        .frame(width: 14, height: 14)
+                        .padding(5)
+                        .background(look.canvas.color, in: Circle())
                 }
             }
+            .foregroundStyle(look.onChrome.color)
             .padding(12)
             .frame(maxWidth: .infinity, minHeight: 60)
-            .background(cardFill, in: shape)
+            .background(look.chromeGradient, in: shape)
             .overlay(outline(selected))
         }
         .buttonStyle(.plain)
@@ -123,7 +128,9 @@ public struct ThemePicker: View {
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 12, style: .continuous) }
 
     private func outline(_ selected: Bool) -> some View {
-        shape.strokeBorder(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(palette.hairline.color), lineWidth: selected ? 2.5 : 1)
+        shape.inset(by: selected ? -4 : 0)
+            .strokeBorder(selected ? AnyShapeStyle(palette.ink.color) : AnyShapeStyle(palette.hairline.color),
+                          lineWidth: selected ? 2.5 : 1)
     }
 
     // Drawn in the theme's own colors, so Black mode is pure black here too.

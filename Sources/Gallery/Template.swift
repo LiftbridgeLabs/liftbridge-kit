@@ -38,7 +38,11 @@ let template = #"""
   .id { color: var(--soft); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
   .shots { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
   .label { font-size: 11px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
-  .screen { border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 128px; overflow: hidden; }
+  .device { border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px rgba(127,127,127,.25); }
+  .frame { padding: 8px 8px 7px; display: flex; flex-direction: column; gap: 5px; }
+  .frame b { font-size: 15px; }
+  .tab { font-size: 11px; font-weight: 600; border-radius: 99px; padding: 2px 8px; }
+  .screen { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 112px; overflow: hidden; }
   .card { border-radius: 8px; padding: 7px 8px; border: 1px solid; }
   .card b { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card span { display: block; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -66,7 +70,7 @@ let template = #"""
   </div>
 </header>
 <main id="groups"></main>
-<footer>Each preview uses the theme's real colors: the background gradient, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color to copy its code. Seasonal groups show in apps only during their dates.</footer>
+<footer>Each preview uses the theme's real colors: the frame (header with a selected tab), the background gradient, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color to copy its code. Seasonal groups show in apps only during their dates.</footer>
 <script>
 const groups = __DATA__;
 const names = { light: "Light", dark: "Dark", black: "Black" };
@@ -80,6 +84,17 @@ function el(tag, cls, text) {
 }
 
 function screen(c) {
+  const wrap = el("div", "device");
+  // The frame: header with a title and tabs, one selected.
+  const frame = el("div", "frame");
+  frame.style.background = `linear-gradient(180deg, ${c.chrome}, ${c.chromeEnd})`;
+  frame.style.color = c.onChrome;
+  const heading = el("b", null, "Recipes");
+  const tabs = el("div", "row");
+  const on = el("span", "tab", "Dinner"); on.style.background = c.selection; on.style.color = c.onSelection;
+  const off = el("span", "tab", "Lunch");
+  tabs.append(on, off);
+  frame.append(heading, tabs);
   const s = el("div", "screen");
   s.style.background = `linear-gradient(180deg, ${c.canvas}, ${c.canvasEnd})`;
   const card = el("div", "card");
@@ -94,11 +109,12 @@ function screen(c) {
   row.append(chip, check, button);
   const link = el("span", "chip", "Link text"); link.style.color = c.accent; link.style.padding = "0";
   s.append(card, row, link);
-  return s;
+  wrap.append(frame, s);
+  return wrap;
 }
 
 const roles = [["accent", "accent"], ["onAccent", "on accent"], ["canvas", "background"], ["canvasEnd", "background end"], ["card", "card"],
-               ["chip", "tag"], ["hairline", "border"], ["ink", "text"], ["muted", "secondary"], ["success", "done"]];
+               ["chip", "tag"], ["chrome", "frame"], ["chromeEnd", "frame end"], ["onChrome", "on frame"], ["selection", "selected"], ["onSelection", "on selected"], ["hairline", "border"], ["ink", "text"], ["muted", "secondary"], ["success", "done"]];
 
 function hexes(c) {
   const box = el("div", "hex");

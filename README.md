@@ -72,6 +72,8 @@ Add the same dependency to any extension that compiles the file holding the app'
 
    Draw full-screen backgrounds with the theme's gradient: `.background(ThemeStore.app.theme.palette.canvasGradient)` (two-tone themes fade between their colors; Black stays flat black).
 
+   Draw the app's frame (the header above lists, the tab bar, toolbars) with `palette.chromeGradient` and put `onChrome` text and icons on it; a selected tab or row on the frame is `selection` with `onSelection` text. Cards and lists stay on `canvas` and `card`, so content stays calm. To give the app's own look a frame, build its palette with `.withFrame(from: swatch)`.
+
    Use `onAccent` for text and icons drawn on an accent fill, including `.borderedProminent` buttons (`.foregroundStyle(Color.onAccent)`): some themes have pale accents in dark mode, where white text can't be read.
 
 3. **Apply the accent and color mode at the root**, from a view or view modifier (not from the `App` itself), so a change redraws right away:

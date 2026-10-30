@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.0 (Oct 30, 2026)
+
+- **A strong frame color for every theme.** `Palette.chrome` and `chromeEnd` (with `chromeGradient` in SwiftUI) are the theme's bold color for the app's frame: the header above lists, tab bars and toolbars, the way a sidebar carries the theme in a desktop chat app. Light mode uses the theme's bright pair, dark mode its deep pair, Black mode pure black. `onChrome` is the text and icon color on it (white or dark), tested at 4.5:1 on both ends.
+- **A selected state.** `selection` and `onSelection` mark a selected tab or row on the frame: the accent where it stands out from the frame (3:1), otherwise a pill in the frame's text color. Text on it is tested at 4.5:1.
+- Content stays calm: `canvas`, `card` and `chip` are unchanged.
+- **Rich tones**, a new group of 8 themes with hand-picked mid-tone backgrounds (cream, slate, deep teal) instead of near-white and near-black: Solstice, Campfire, Nightshade, Woodland, Rosewood, Fjord, Parchment, Slate.
+- **The picker's cards show each theme's frame**, with its accent on its reading color, so themes look as different in the picker as in the app.
+- An app's own palette without `chrome` keeps a calm frame (its canvas, with its main text color). Pass `chrome:`, `chromeEnd:` and `onChrome:` to `Palette(...)`, or call `palette.withFrame(from: swatch)` to get one from the swatch's colors.
+
 ## 2.1.1 (Oct 30, 2026)
 
 - `canvasGradient` now runs top to bottom (it was diagonal), so a bar pinned at the top of a screen and drawn in `canvas` matches the background above the fade.
