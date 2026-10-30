@@ -47,7 +47,7 @@ let template = #"""
   .button { margin-left: auto; font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 8px; }
   .check { width: 14px; height: 14px; border-radius: 50%; flex: none; }
   .hex { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-  .hex button { font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; display: inline-flex; gap: 4px; align-items: center;
+  .hex button { user-select: text; font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; display: inline-flex; gap: 4px; align-items: center;
                 border: 1px solid var(--line); background: none; color: var(--soft); border-radius: 6px; padding: 1px 5px; cursor: pointer; }
   .hex i { width: 9px; height: 9px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(127,127,127,.4); }
   footer { color: var(--soft); font-size: 13px; padding: 0 16px 30px; max-width: 1400px; margin: 0 auto; }
@@ -66,7 +66,7 @@ let template = #"""
   </div>
 </header>
 <main id="groups"></main>
-<footer>Each preview uses the theme's real colors: background, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color code to copy it. Seasonal groups show in apps only during their dates.</footer>
+<footer>Each preview uses the theme's real colors: background, a card with main and secondary text, a tag, the accent button and the "done" color. Tap a color to copy its code. Seasonal groups show in apps only during their dates.</footer>
 <script>
 const groups = __DATA__;
 const names = { light: "Light", dark: "Dark", black: "Black" };
@@ -97,14 +97,28 @@ function screen(c) {
   return s;
 }
 
+const roles = [["accent", "accent"], ["onAccent", "on accent"], ["canvas", "background"], ["card", "card"],
+               ["chip", "tag"], ["hairline", "border"], ["ink", "text"], ["muted", "secondary"], ["success", "done"]];
+
 function hexes(c) {
   const box = el("div", "hex");
-  for (const role of ["accent", "canvas", "card", "chip", "ink"]) {
+  for (const [role, label] of roles) {
     const b = el("button");
-    b.title = role + ": tap to copy";
+    b.title = label + ": tap to copy";
     const sw = el("i"); sw.style.background = c[role];
-    b.append(sw, document.createTextNode(c[role].slice(1)));
-    b.addEventListener("click", () => { try { navigator.clipboard.writeText(c[role]); } catch (e) {} });
+    const text = el("span", null, label + " " + c[role].slice(1));
+    b.append(sw, text);
+    b.addEventListener("click", async () => {
+      const before = text.textContent;
+      try {
+        await navigator.clipboard.writeText(c[role]);
+        text.textContent = "Copied";
+      } catch (e) {
+        // Some browsers block copying from a local file; the code can still be selected.
+        text.textContent = "Select to copy";
+      }
+      setTimeout(() => { text.textContent = before; }, 1200);
+    });
     box.append(b);
   }
   return box;
