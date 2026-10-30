@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import Testing
 @testable import LiftbridgeThemes
 
@@ -170,6 +171,17 @@ private func date(_ month: Int, _ day: Int) -> Date {
                 #expect(turn < 0.15, "\(theme.name): frame end turns \(turn) rad of hue")
             }
         }
+    }
+
+    /// The README's FrameFade placement compiles as written.
+    @MainActor @Test func frameFadeHangsOffAHeader() {
+        let palette = house.palette
+        let header = Text("Recipes")
+            .background(palette.chrome.color)
+            .overlay(alignment: .bottom) {
+                FrameFade(palette).offset(y: 36)
+            }
+        _ = header
     }
 
     @Test func frameTextFallsBackToBlack() {

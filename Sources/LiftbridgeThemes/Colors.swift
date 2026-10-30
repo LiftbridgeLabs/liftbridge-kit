@@ -52,9 +52,9 @@ extension Palette {
 }
 
 /// The soft bottom edge of a header band: the frame's color fading to clear
-/// over the content. Place it right below a band of flat `chrome`, for
-/// example `.safeAreaInset(edge: .top) { header }` then `FrameFade(palette)`
-/// overlaid at the band's bottom.
+/// over the content. Overlay it at the band's bottom and offset it by its
+/// height, so it hangs over the content without moving it:
+/// `header.background(palette.chrome.color).overlay(alignment: .bottom) { FrameFade(palette).offset(y: 36) }`.
 public struct FrameFade: View {
     private let palette: Palette
     private let height: CGFloat
