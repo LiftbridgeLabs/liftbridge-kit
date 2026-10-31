@@ -1,0 +1,6 @@
+# For apps that get the Android library through JitPack (see README, Android):
+# JitPack builds it from a release tag with these commands.
+jdk:
+  - openjdk17
+install:
+  - cd android && ./gradlew --no-daemon :liftbridge-themes:publishToMavenLocal

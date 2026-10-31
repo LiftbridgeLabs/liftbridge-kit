@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0 (Oct 30, 2026)
+
+- **Android.** `LiftbridgeThemes` for Android (Kotlin, Jetpack Compose, API 26+, phones and TV) in `android/`: the same catalog, theme ids and colors, Light / Dark / Black / System saved on the device under the same keys, a Compose palette (`LiftbridgeTheme`, `LocalThemeColors`), `FrameFade`, and a `ThemePicker` that works with a TV remote as well as touch. Its colors are generated from the Swift catalog (`swift run KotlinCatalog`), and its tests check that its color math gives exactly the same colors as Swift's. Apps include it from source (`includeBuild`), see the README.
+- **Computed colors are rounded to what a screen shows** (whole steps of 1/255), so contrast is tested on the displayed colors and both platforms get identical values. The change is under 1/255 per channel.
+- CI builds and tests the Android library and fails if its colors fall behind the Swift catalog.
+
 ## 2.3.0 (Oct 30, 2026)
 
 - **`FrameFade`**: the frame's color fading to clear (36 pt by default), to put right under a header band so it eases into the content instead of ending in a hard line. Also as a gradient: `palette.frameFade`. The README now describes the frame as flat `chrome` plus `FrameFade`.

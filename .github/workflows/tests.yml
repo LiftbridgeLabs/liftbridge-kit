@@ -21,3 +21,26 @@ jobs:
           persist-credentials: false
       - name: Build and test
         run: swift test
+      - name: Android colors match the Swift catalog
+        # The Kotlin catalog is generated from the Swift one; a theme change
+        # that wasn't regenerated fails here.
+        run: |
+          swift run KotlinCatalog
+          git diff --exit-code -- android/
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Gradle wrapper is Gradle's own
+        # The official gradle-wrapper.jar from Gradle 8.9
+        # (services.gradle.org/distributions/gradle-8.9-wrapper.jar.sha256).
+        run: echo "498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17  android/gradle/wrapper/gradle-wrapper.jar" | sha256sum --check
+      - name: Build and test
+        working-directory: android
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          ./gradlew --no-daemon :liftbridge-themes:testDebugUnitTest :liftbridge-themes:assembleRelease

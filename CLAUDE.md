@@ -15,7 +15,11 @@ tokens, test data, or app plans, and don't name an app that isn't in the store.
 
 ## Releasing
 
-1. Change the code, add tests, `swift test`.
+1. Change the code, add tests, `swift test`. After any theme or color change,
+   `swift run KotlinCatalog` regenerates the Android colors, then
+   `cd android && ./gradlew :liftbridge-themes:testDebugUnitTest` (JAVA_HOME is
+   Android Studio's: `/Applications/Android Studio.app/Contents/jbr/Contents/Home`).
+   Bump `VERSION` (the Android library's version) with each tag.
 2. CodeRabbit once per batch, before the push (workspace review flow).
 3. Add the version to CHANGELOG.md: minor for new themes, seasons, renames and
    fixes; major only for a change apps must adapt to, with what to change.

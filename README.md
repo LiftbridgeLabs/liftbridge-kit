@@ -1,6 +1,6 @@
 # Liftbridge Kit
 
-Shared code for Liftbridge Labs apps. Each library is a separate Swift package product, so an app adds only the ones it uses.
+Shared code for Liftbridge Labs apps. Each library is a separate Swift package product, so an app adds only the ones it uses. `LiftbridgeThemes` also comes as an Android library for Jetpack Compose (see [Android](#android)), with the same themes in exactly the same colors.
 
 | Library | What it does |
 | --- | --- |
@@ -111,6 +111,48 @@ Add the same dependency to any extension that compiles the file holding the app'
 
 The choice is saved in `UserDefaults.standard` on the device. Widgets and extensions run on their own and keep the house look unless the app shares its settings with them.
 
+## Android
+
+`android/` holds `LiftbridgeThemes` for Android (Kotlin, Jetpack Compose), Android 8.0 (API 26) and up, phones and TV. Its theme colors are generated from the Swift catalog (`swift run KotlinCatalog`), and its tests check that its color math (Black mode, frames, an app's own palette) gives exactly the same colors as the Swift package.
+
+**Add it to an app.** Check out this repo next to the app (or as a git submodule, pinned to a release tag) and include its build in the app's `settings.gradle.kts`:
+
+```kotlin
+includeBuild("../liftbridge-kit/android")
+```
+
+then depend on it in the app module:
+
+```kotlin
+implementation("com.liftbridgelabs:liftbridge-themes:2.4.0")
+```
+
+Gradle builds it from the included source; nothing is downloaded from a package host. (The repo also has a `jitpack.yml`, so the library can be served by JitPack from a release tag instead, if that's chosen.)
+
+**Use it.**
+
+```kotlin
+val house = Theme("house", "My App", Swatch.of(0xF0A070 to 0xB4410F, 0x4A1E0C to 0xB4410F),
+    Palette.of(accent = Shade(0xB4410F, 0xF08A4B), onAccent = Shade(0xFFFFFF, 0x16120F),
+        canvas = Shade(0xFAF7F2, 0x16120F), card = Shade(0xFFFFFF, 0x241E19), chip = Shade(0xF1EADF, 0x2C251F),
+        hairline = Shade(0xE6DED2, 0x3A322A), ink = Shade(0x1F1B16, 0xF6EFE6), muted = Shade(0x6B6259, 0xB9AFA3),
+        success = Shade(0x3F6212, 0x9BC26A)))
+val store = ThemeStore(house, settings = SharedPreferencesSettings(context))   // keep one for the app
+
+setContent {
+    LiftbridgeTheme(store) {
+        val colors = LocalThemeColors.current   // accent, canvas, card, ink, chrome, onChrome, selection…
+        // the frame: flat colors.chrome with colors.onChrome text, then FrameFade() over the content
+    }
+}
+
+ThemePicker(store)   // in Settings: Light / Dark / Black / System and the theme grid
+```
+
+- `ThemePicker` works with touch and with a TV remote: the focused card grows and gets a ring, and select picks it. `allSeasons = true` shows every seasonal group (for testers); `isLocked` marks themes the app doesn't offer yet; `columns` sets the grid (`GridCells.Fixed(4)` suits a TV).
+- An app that shows fewer themes (for example the first five of each group) passes its own `groups` to `ThemeStore`.
+- The choice is saved under the same keys as the Swift package (`LiftbridgeThemes.theme`, `LiftbridgeThemes.colorMode`).
+
 ## Versions
 
 Apps depend on `from: 2.0.0`, so they take new 2.x releases when they update their packages, and never a 3.0.
@@ -134,6 +176,7 @@ Writes `gallery.html` (not committed) and opens it: every theme as a small mock 
 
 ```sh
 swift test
+cd android && ./gradlew :liftbridge-themes:testDebugUnitTest
 ```
 
 The tests check every theme for readable contrast (WCAG AA, 4.5:1) in light, dark and Black mode, check that themes in the same group look clearly different, and cover seasons and saving the choice. CI runs them on every push.

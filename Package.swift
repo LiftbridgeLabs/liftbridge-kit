@@ -15,5 +15,8 @@ let package = Package(
         .testTarget(name: "LiftbridgeThemesTests", dependencies: ["LiftbridgeThemes"]),
         // `swift run Gallery`: a page showing every theme's colors (not shipped to apps).
         .executableTarget(name: "Gallery", dependencies: ["LiftbridgeThemes"]),
+        // `swift run KotlinCatalog`: writes the Android library's theme colors
+        // from this catalog, so both platforms share one set (not shipped to apps).
+        .executableTarget(name: "KotlinCatalog", dependencies: ["LiftbridgeThemes"]),
     ]
 )

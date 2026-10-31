@@ -69,18 +69,26 @@ extension RGB {
         return OKLCH(lightness: L, chroma: hypot(A, B), hue: atan2(B, A))
     }
 
-    /// The color, with chroma lowered until it fits in sRGB (so the hue holds).
+    /// The color as a screen shows it: each channel a whole step of 1/255.
+    /// Computed colors are rounded so contrast is tested on what's displayed,
+    /// and so every platform gets exactly the same values.
+    public var displayed: RGB {
+        RGB(red: Double(Self.byte(red)) / 255, green: Double(Self.byte(green)) / 255, blue: Double(Self.byte(blue)) / 255)
+    }
+
+    /// The color, with chroma lowered until it fits in sRGB (so the hue holds),
+    /// rounded to what a screen shows.
     public init(_ lch: OKLCH) {
         let lightness = min(max(lch.lightness, 0), 1)
         var chroma = max(lch.chroma, 0)
         while chroma > 0 {
             if let rgb = Self.exact(OKLCH(lightness: lightness, chroma: chroma, hue: lch.hue)) {
-                self = rgb
+                self = rgb.displayed
                 return
             }
             chroma -= 0.002
         }
-        self = Self.exact(OKLCH(lightness: lightness, chroma: 0, hue: 0)) ?? .black
+        self = (Self.exact(OKLCH(lightness: lightness, chroma: 0, hue: 0)) ?? .black).displayed
     }
 
     private static func exact(_ lch: OKLCH) -> RGB? {
