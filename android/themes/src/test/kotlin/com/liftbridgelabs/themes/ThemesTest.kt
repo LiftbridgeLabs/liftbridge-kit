@@ -43,9 +43,7 @@ class MapSettings : ThemeSettings {
 
 class ParityTest {
     @Test fun catalogMatchesSwift() {
-        assertEquals(54, allThemes.size)
-        assertEquals(listOf("halloween", "thanksgiving", "holidays", "solid", "two-tone", "timeless", "rich-tones", "color-vision"),
-            ThemeGroup.shared.map { it.id })
+        assertEquals(SwiftResults.groups, ThemeGroup.shared.map { group -> group.id to group.themes.map { it.id } })
     }
 
     @Test fun blackModeMatchesSwift() {

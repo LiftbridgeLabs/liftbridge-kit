@@ -4,6 +4,18 @@ package com.liftbridgelabs.themes
 
 /** Swift's results, which the Kotlin color math must match. */
 internal object SwiftResults {
+    /** The Swift catalog's groups, each with its theme ids, in picker order. */
+    val groups: List<Pair<String, List<String>>> = listOf(
+        "halloween" to listOf("ooze", "counts-cape", "trick-or-treat", "moonlit", "boo", "monster-mash"),
+        "thanksgiving" to listOf("pumpkin-pie", "cranberry", "sage", "maple", "hearth", "apple-cider"),
+        "holidays" to listOf("evergreen", "candy-cane", "snowfall", "gingerbread", "tinsel", "mistletoe"),
+        "solid" to listOf("harbor", "ember", "fern", "plum", "honey", "peony", "midnight", "pebble"),
+        "two-tone" to listOf("daydream", "spring-rain", "opal", "golden-hour", "pine-lake", "lilac-fizz", "citrus-grove", "jam-session", "trailhead", "acorn", "first-light", "pinstripe"),
+        "timeless" to listOf("denim", "cocoa-leaf", "prism", "glacier", "grapefruit", "tweed"),
+        "rich-tones" to listOf("solstice", "campfire", "nightshade", "woodland", "rosewood", "fjord", "parchment", "slate"),
+        "color-vision" to listOf("red-green-friendly", "blue-yellow-friendly"),
+    )
+
     /** Each catalog theme's Black-mode palette, by id. */
     val black: Map<String, Palette> by lazy {
         mapOf(

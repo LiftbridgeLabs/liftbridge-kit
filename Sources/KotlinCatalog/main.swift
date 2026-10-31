@@ -94,6 +94,11 @@ package com.liftbridgelabs.themes
 
 /** Swift's results, which the Kotlin color math must match. */
 internal object SwiftResults {
+    /** The Swift catalog's groups, each with its theme ids, in picker order. */
+    val groups: List<Pair<String, List<String>>> = listOf(
+\(ThemeGroup.shared.map { group in "        \(kotlinString(group.id)) to listOf(\(group.themes.map { kotlinString($0.id) }.joined(separator: ", ")))," }.joined(separator: "\n"))
+    )
+
     /** Each catalog theme's Black-mode palette, by id. */
     val black: Map<String, Palette> by lazy {
         mapOf(
