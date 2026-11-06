@@ -4,6 +4,7 @@
 "Color mode" = "Farbmodus";
 "New" = "Neu";
 "%@, locked" = "%@, gesperrt";
+"Locked" = "Gesperrt";
 "Light" = "Hell";
 "Dark" = "Dunkel";
 "Black" = "Schwarz";

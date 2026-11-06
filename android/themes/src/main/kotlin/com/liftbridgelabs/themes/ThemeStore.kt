@@ -41,7 +41,12 @@ class ThemeStore(
     val house: Theme,
     val groups: List<ThemeGroup> = ThemeGroup.shared,
     private val settings: ThemeSettings,
+    /** The languages the app itself comes in, as codes ("en", "de"). The picker shows the phone's language if it's here. */
+    val languages: Set<String> = setOf("en"),
 ) {
+    /** The language the picker shows its text in (see `pickLanguage`). */
+    val language: String get() = pickLanguage(languages)
+
     private var chosen by mutableStateOf(
         groups.flatMap { it.themes }.firstOrNull { it.id == settings.get(THEME_KEY) } ?: house,
     )

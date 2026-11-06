@@ -61,6 +61,7 @@ fun ThemePicker(
     columns: GridCells = GridCells.Adaptive(180.dp),
 ) {
     val page = store.colors()
+    val language = store.language
     val dark = store.isDark()
     LazyVerticalGrid(
         columns = columns,
@@ -69,7 +70,7 @@ fun ThemePicker(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) { Heading("Color mode", badge = null, page) }
+        item(span = { GridItemSpan(maxLineSpan) }) { Heading(localized("Color mode", language), badge = null, page) }
         item(span = { GridItemSpan(maxLineSpan) }) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ColorMode.entries.forEach { mode ->
@@ -79,9 +80,9 @@ fun ThemePicker(
                         fill = Brush.verticalGradient(listOf(page.card, page.card)),
                         onClick = { store.select(mode) },
                         modifier = Modifier.weight(1f),
-                        description = mode.title,
+                        description = mode.title(language),
                     ) {
-                        Label(mode.title, page.ink, Modifier.fillMaxWidth())
+                        Label(mode.title(language), page.ink, Modifier.fillMaxWidth())
                     }
                 }
             }
@@ -89,29 +90,30 @@ fun ThemePicker(
         store.visibleGroups(today, allSeasons).forEach { group ->
             val badge = group.season?.let { season ->
                 when {
-                    season.contains(today) -> "New"
+                    season.contains(today) -> localized("New", language)
                     allSeasons -> season.label()
                     else -> null
                 }
             }
-            item(span = { GridItemSpan(maxLineSpan) }, key = "group-${group.id}") { Heading(group.title, badge, page) }
+            item(span = { GridItemSpan(maxLineSpan) }, key = "group-${group.id}") { Heading(group.title(language), badge, page) }
             group.themes.forEach { theme ->
                 item(key = "theme-${group.id}-${theme.id}") {
                     val look = (if (store.colorMode == ColorMode.BLACK) theme.black else theme).palette.colors(dark)
                     val locked = isLocked(theme)
+                    val name = theme.name(language)
                     Tile(
                         selected = store.theme.id == theme.id,
                         page = page,
                         fill = Brush.verticalGradient(listOf(look.chrome, look.chromeEnd)),
                         onClick = { store.select(theme) },
                         enabled = !locked,
-                        description = if (locked) "${theme.name}, locked" else theme.name,
+                        description = if (locked) localized("%@, locked", language).replace("%@", name) else name,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Label(theme.name, look.onChrome, Modifier.weight(1f))
+                            Label(name, look.onChrome, Modifier.weight(1f))
                             Spacer(Modifier.width(8.dp))
                             when {
-                                locked -> Label("Locked", look.onChrome)
+                                locked -> Label(localized("Locked", language), look.onChrome)
                                 store.theme.id == theme.id -> Label("✓", look.onChrome)
                                 // The theme's accent, on its own reading color.
                                 else -> Box(

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.0 (Nov 6, 2026)
+
+- **German on Android.** The Android picker shows the same German text as Apple's: color modes, "New", "Locked", group headings and every theme name. The text is generated from the Swift kit's language files (`swift run KotlinCatalog` writes `GeneratedStrings.kt`), so the two can't drift. Android can't tell which languages an app has, so an app with German lists them: `ThemeStore(..., languages = setOf("en", "de"))`; the default, English only, keeps the picker English. For a custom picker: `theme.name(store.language)`, `group.title(store.language)`, `mode.title(store.language)`.
+- The gallery shows each theme's German name under its English one.
+
 ## 2.5.0 (Nov 6, 2026)
 
 - **German.** The picker's title, color modes, "New" badge, group headings and all 51 theme names in German. The picker follows the app's language, not the phone's, so an English-only app stays English. For a custom picker: `Theme.localizedName`, `ThemeGroup.localizedTitle`, and `ColorMode.title` (now localized). `name` and `title` stay English. A test checks every name and heading has German. Apple only so far; Android stays English.

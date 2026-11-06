@@ -111,7 +111,7 @@ Add the same dependency to any extension that compiles the file holding the app'
 
 ### Languages
 
-The picker's text (its title, the color modes, group headings and theme names) comes in English and German. It follows the app's language, not the phone's: in an app that has German, a German phone sees a German picker, and an app that is English only stays English everywhere. Nothing to set up; the app only needs German among its own languages. An app's own theme name (`name: "My App"`) shows as given, so translate it in the app.
+The picker's text (its title, the color modes, group headings and theme names) comes in English and German, on Apple and Android (see Android for its one setting). It follows the app's language, not the phone's: in an app that has German, a German phone sees a German picker, and an app that is English only stays English everywhere. Nothing to set up; the app only needs German among its own languages. An app's own theme name (`name: "My App"`) shows as given, so translate it in the app.
 
 A custom picker (on TV, say) shows `theme.localizedName`, `group.localizedTitle` and `mode.title`; `theme.name` and `group.title` stay English.
 
@@ -130,7 +130,7 @@ includeBuild("../liftbridge-kit/android")
 then depend on it in the app module:
 
 ```kotlin
-implementation("com.liftbridgelabs:liftbridge-themes:2.4.0")
+implementation("com.liftbridgelabs:liftbridge-themes:2.6.0")
 ```
 
 Gradle builds it from the included source; nothing is downloaded from a package host. (The repo also has a `jitpack.yml`, so the library can be served by JitPack from a release tag instead, if that's chosen.)
@@ -158,6 +158,7 @@ ThemePicker(store)   // in Settings: Light / Dark / Black / System and the theme
 - `ThemePicker` works with touch and with a TV remote: the focused card grows and gets a ring, and select picks it. `allSeasons = true` shows every seasonal group (for testers); `isLocked` marks themes the app doesn't offer yet; `columns` sets the grid (`GridCells.Fixed(4)` suits a TV).
 - An app that shows fewer themes (for example the first five of each group) passes its own `groups` to `ThemeStore`.
 - The choice is saved under the same keys as the Swift package (`LiftbridgeThemes.theme`, `LiftbridgeThemes.colorMode`).
+- **Languages:** the picker comes in English and German, the same text as on Apple. Android can't tell which languages an app has, so an app with German says so: `ThemeStore(house, settings = ..., languages = setOf("en", "de"))`. The picker then shows German on a German phone; an app that lists only English (the default) stays English. A custom picker shows `theme.name(store.language)`, `group.title(store.language)` and `mode.title(store.language)`.
 
 ## Versions
 
