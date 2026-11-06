@@ -35,6 +35,7 @@ let template = #"""
   .title { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .dot { width: 28px; height: 28px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
   .name { font-weight: 700; }
+  .german { color: var(--soft); font-size: 13px; }
   .id { color: var(--soft); font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
   .shots { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
   .label { font-size: 11px; font-weight: 600; color: var(--soft); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
@@ -149,6 +150,8 @@ function render() {
   const dark = matchMedia("(prefers-color-scheme: dark)").matches;
   for (const g of groups) {
     const h = el("h2", null, g.title);
+    // The German heading and names, as a German-language app shows them.
+    if (g.german !== g.title) h.append(el("span", "german", " · " + g.german));
     if (g.season) h.append(el("span", "season", g.season));
     const grid = el("div", "grid");
     for (const t of g.themes) {
@@ -158,7 +161,9 @@ function render() {
       const sw = dark ? t.swatch.dark : t.swatch.light;
       dot.style.background = `linear-gradient(135deg, ${sw[0]}, ${sw[1]})`;
       const text = el("div");
-      text.append(el("div", "name", t.name), el("div", "id", t.id));
+      text.append(el("div", "name", t.name));
+      if (t.german !== t.name) text.append(el("div", "german", t.german));
+      text.append(el("div", "id", t.id));
       head.append(dot, text);
       const shots = el("div", "shots");
       for (const m of shown) {

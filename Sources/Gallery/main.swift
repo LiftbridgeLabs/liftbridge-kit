@@ -21,11 +21,13 @@ let roles: [(String, KeyPath<Palette, Shade>)] = [
 let groups: [[String: Any]] = ThemeGroup.shared.map { group in
     [
         "title": group.title,
+        "german": group.title(in: "de"),
         "season": group.season.map { $0.label(locale: Locale(identifier: "en_US")) } ?? "",
         "themes": group.themes.map { theme -> [String: Any] in
             [
                 "id": theme.id,
                 "name": theme.name,
+                "german": theme.name(in: "de"),
                 "swatch": ["light": theme.swatch.light.map { "#" + $0.hex }, "dark": theme.swatch.dark.map { "#" + $0.hex }],
                 "light": colors(theme.palette, \.light),
                 "dark": colors(theme.palette, \.dark),

@@ -24,9 +24,15 @@ enum Localized {
 extension Theme {
     /// The name to show, in the app's language. `name` stays the English one.
     public var localizedName: String { Localized.string(name) }
+
+    /// The name in one of the kit's languages ("de"), whatever the app's.
+    public func name(in language: String) -> String { Localized.string(name, language: language) }
 }
 
 extension ThemeGroup {
     /// The heading to show, in the app's language. `title` stays the English one.
     public var localizedTitle: String { Localized.string(title) }
+
+    /// The heading in one of the kit's languages ("de"), whatever the app's.
+    public func title(in language: String) -> String { Localized.string(title, language: language) }
 }
