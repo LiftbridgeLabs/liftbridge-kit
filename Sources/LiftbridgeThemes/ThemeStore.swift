@@ -8,12 +8,13 @@ public enum ColorMode: String, CaseIterable, Identifiable, Sendable {
 
     public var id: String { rawValue }
 
+    /// The name to show, in the app's language.
     public var title: String {
         switch self {
-        case .light: "Light"
-        case .dark: "Dark"
-        case .black: "Black"
-        case .system: "System"
+        case .light: Localized.string("Light")
+        case .dark: Localized.string("Dark")
+        case .black: Localized.string("Black")
+        case .system: Localized.string("System")
         }
     }
 

@@ -6,12 +6,15 @@ import PackageDescription
 // the Mac (and in CI) without a simulator.
 let package = Package(
     name: "LiftbridgeKit",
+    // English is the source; other languages sit next to it in
+    // Sources/LiftbridgeThemes/Resources (de.lproj, ...).
+    defaultLocalization: "en",
     platforms: [.iOS(.v18), .tvOS(.v18), .macOS(.v15)],
     products: [
         .library(name: "LiftbridgeThemes", targets: ["LiftbridgeThemes"]),
     ],
     targets: [
-        .target(name: "LiftbridgeThemes"),
+        .target(name: "LiftbridgeThemes", resources: [.process("Resources")]),
         .testTarget(name: "LiftbridgeThemesTests", dependencies: ["LiftbridgeThemes"]),
         // `swift run Gallery`: a page showing every theme's colors (not shipped to apps).
         .executableTarget(name: "Gallery", dependencies: ["LiftbridgeThemes"]),

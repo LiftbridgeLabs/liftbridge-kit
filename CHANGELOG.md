@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0 (Nov 6, 2026)
+
+- **German.** The picker's title, color modes, "New" badge, group headings and all 51 theme names in German. The picker follows the app's language, not the phone's, so an English-only app stays English. For a custom picker: `Theme.localizedName`, `ThemeGroup.localizedTitle`, and `ColorMode.title` (now localized). `name` and `title` stay English. A test checks every name and heading has German. Apple only so far; Android stays English.
+
 ## 2.4.0 (Oct 30, 2026)
 
 - **Android.** `LiftbridgeThemes` for Android (Kotlin, Jetpack Compose, API 26+, phones and TV) in `android/`: the same catalog, theme ids and colors, Light / Dark / Black / System saved on the device under the same keys, a Compose palette (`LiftbridgeTheme`, `LocalThemeColors`), `FrameFade`, and a `ThemePicker` that works with a TV remote as well as touch. Its colors are generated from the Swift catalog (`swift run KotlinCatalog`), and its tests check that its color math gives exactly the same colors as Swift's. Apps include it from source (`includeBuild`), see the README.

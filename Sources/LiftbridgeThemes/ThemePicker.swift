@@ -1,7 +1,8 @@
 import SwiftUI
 
 // iPhone, iPad and Mac. A TV app builds its own picker for the remote from
-// ThemeStore (visibleGroups, select, colorMode) and Swatch.gradient.
+// ThemeStore (visibleGroups, select, colorMode), Swatch.gradient and the
+// localized names (Theme.localizedName, ThemeGroup.localizedTitle, ColorMode.title).
 #if !os(tvOS)
 
 /// Color mode (Light, Dark, Black, System) and a grid of theme cards, grouped,
@@ -24,13 +25,13 @@ public struct ThemePicker: View {
         let now = Date.now
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                section("Color mode") {
+                section(Localized.string("Color mode")) {
                     HStack(spacing: 8) {
                         ForEach(ColorMode.allCases) { mode in modeButton(mode) }
                     }
                 }
                 ForEach(store.visibleGroups(on: now, allSeasons: allSeasons)) { group in
-                    section(group.title, badge: badge(for: group, on: now)) {
+                    section(group.localizedTitle, badge: badge(for: group, on: now)) {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
                             ForEach(group.themes) { theme in card(theme) }
                         }
@@ -40,7 +41,7 @@ public struct ThemePicker: View {
             .padding()
         }
         .background(background)
-        .navigationTitle("Theme")
+        .navigationTitle(Localized.string("Theme"))
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -48,7 +49,7 @@ public struct ThemePicker: View {
 
     private func badge(for group: ThemeGroup, on date: Date) -> String? {
         guard let season = group.season else { return nil }
-        return season.contains(date) ? "New" : allSeasons ? season.label() : nil
+        return season.contains(date) ? Localized.string("New") : allSeasons ? season.label() : nil
     }
 
     private func section<Content: View>(_ title: String, badge: String? = nil,
@@ -97,7 +98,7 @@ public struct ThemePicker: View {
         let look = (store.colorMode == .black ? theme.black : theme).palette
         return Button { store.select(theme) } label: {
             HStack(spacing: 10) {
-                Text(theme.name)
+                Text(theme.localizedName)
                     .font(.subheadline.weight(.semibold))
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -121,7 +122,7 @@ public struct ThemePicker: View {
         }
         .buttonStyle(.plain)
         .disabled(locked)
-        .accessibilityLabel(locked ? "\(theme.name), locked" : theme.name)
+        .accessibilityLabel(locked ? String(format: Localized.string("%@, locked"), theme.localizedName) : theme.localizedName)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 

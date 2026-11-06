@@ -109,6 +109,12 @@ Add the same dependency to any extension that compiles the file holding the app'
    - `allSeasons: true` lists every seasonal set with its dates (handy in Debug builds).
    - `isLocked: { theme in ... }` shows a lock on themes the app doesn't offer yet and keeps them from being picked.
 
+### Languages
+
+The picker's text (its title, the color modes, group headings and theme names) comes in English and German. It follows the app's language, not the phone's: in an app that has German, a German phone sees a German picker, and an app that is English only stays English everywhere. Nothing to set up; the app only needs German among its own languages. An app's own theme name (`name: "My App"`) shows as given, so translate it in the app.
+
+A custom picker (on TV, say) shows `theme.localizedName`, `group.localizedTitle` and `mode.title`; `theme.name` and `group.title` stay English.
+
 The choice is saved in `UserDefaults.standard` on the device. Widgets and extensions run on their own and keep the house look unless the app shares its settings with them.
 
 ## Android

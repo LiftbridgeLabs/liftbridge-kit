@@ -279,3 +279,31 @@ private func date(_ month: Int, _ day: Int) -> Date {
         #expect(!ThemeGroup.halloween.season!.contains(october15, calendar: Calendar(identifier: .islamicUmmAlQura)))
     }
 }
+
+@Suite struct Languages {
+    /// Every name, heading and label the picker shows.
+    private var texts: [String] {
+        let picker = ["Theme", "Color mode", "New", "%@, locked"] + ColorMode.allCases.map(\.rawValue.capitalized)
+        return picker + ThemeGroup.shared.flatMap { [$0.title] + $0.themes.map(\.name) }
+    }
+
+    @Test func everyTextHasGerman() {
+        #expect(Localized.languages.contains("de"))
+        let german = Bundle.module.path(forResource: "de", ofType: "lproj").flatMap(Bundle.init(path:))
+        for text in texts {
+            #expect(german?.localizedString(forKey: text, value: nil, table: nil) != text || ["System", "Halloween", "Thanksgiving",
+                    "Cranberry", "Opal", "Denim", "Grapefruit", "Tweed", "Fjord"].contains(text), "No German for \(text)")
+        }
+    }
+
+    @Test func germanNamesStayDistinct() {
+        let names = ThemeGroup.shared.flatMap(\.themes).map { Localized.string($0.name, language: "de") }
+        #expect(Set(names).count == names.count)
+        #expect(Localized.string("Trick or Treat", language: "de") == "Süßes oder Saures")
+    }
+
+    @Test func unknownTextShowsAsGiven() {
+        #expect(Localized.string("Padella", language: "de") == "Padella")
+        #expect(Localized.string("Ember", language: "en") == "Ember")
+    }
+}
