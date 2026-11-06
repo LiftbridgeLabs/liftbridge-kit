@@ -151,7 +151,11 @@ function render() {
   for (const g of groups) {
     const h = el("h2", null, g.title);
     // The German heading and names, as a German-language app shows them.
-    if (g.german !== g.title) h.append(el("span", "german", " · " + g.german));
+    if (g.german !== g.title) {
+      const german = el("span", "german", " · " + g.german);
+      german.lang = "de";
+      h.append(german);
+    }
     if (g.season) h.append(el("span", "season", g.season));
     const grid = el("div", "grid");
     for (const t of g.themes) {
@@ -162,7 +166,11 @@ function render() {
       dot.style.background = `linear-gradient(135deg, ${sw[0]}, ${sw[1]})`;
       const text = el("div");
       text.append(el("div", "name", t.name));
-      if (t.german !== t.name) text.append(el("div", "german", t.german));
+      if (t.german !== t.name) {
+        const german = el("div", "german", t.german);
+        german.lang = "de";
+        text.append(german);
+      }
       text.append(el("div", "id", t.id));
       head.append(dot, text);
       const shots = el("div", "shots");

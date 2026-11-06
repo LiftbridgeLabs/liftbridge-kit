@@ -111,7 +111,7 @@ Add the same dependency to any extension that compiles the file holding the app'
 
 ### Languages
 
-The picker's text (its title, the color modes, group headings and theme names) comes in English and German, on Apple and Android (see Android for its one setting). It follows the app's language, not the phone's: in an app that has German, a German phone sees a German picker, and an app that is English only stays English everywhere. Nothing to set up; the app only needs German among its own languages. An app's own theme name (`name: "My App"`) shows as given, so translate it in the app.
+The picker's text (its title, the color modes, group headings and theme names) comes in English and German, on Apple and Android (see Android for its one setting). It follows the app's language, not the phone's: in an app that has German, a German phone sees a German picker, and an app that is English only stays English everywhere. On Apple there's nothing to set up; the app only needs German among its own languages. On Android the app lists its languages once (`languages = setOf("en", "de")`, see Android); the default is English only. An app's own theme name (`name: "My App"`) shows as given, so translate it in the app.
 
 A custom picker (on TV, say) shows `theme.localizedName`, `group.localizedTitle` and `mode.title`; `theme.name` and `group.title` stay English.
 
