@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.6.1 (Nov 7, 2026)
+
+- **Whole words at every text size.** At the largest text sizes the picker broke words mid-word and cut off the color modes. Now, on Apple and Android:
+  - Theme cards widen as the text grows, so a phone goes from two cards per row to one before a name has to break (tablets keep more per row).
+  - The color modes sit four across only when every word fits; otherwise (the largest sizes, or a language with longer words, such as German on Android) they stack, one full-width row each.
+  - At the largest sizes a group's badge ("New", a season's dates) sits under its heading instead of beside it.
+  - Text is never capped: it grows with the person's setting.
+- Checked in an app and a sample on iPhone and Android, in English and German, from the default size up to the largest.
+
 ## 2.6.0 (Nov 6, 2026)
 
 - **German on Android.** The Android picker shows the same German text as Apple's: color modes, "New", "Locked", group headings and every theme name. The text is generated from the Swift kit's language files (`swift run KotlinCatalog` writes `GeneratedStrings.kt`), so the two can't drift. Android can't tell which languages an app has, so an app with German lists them: `ThemeStore(..., languages = setOf("en", "de"))`; the default, English only, keeps the picker English. For a custom picker: `theme.name(store.language)`, `group.title(store.language)`, `mode.title(store.language)`.

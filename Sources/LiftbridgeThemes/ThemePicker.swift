@@ -9,6 +9,9 @@ import SwiftUI
 /// with the in-season group marked "New". Push it from Settings.
 public struct ThemePicker: View {
     @Bindable private var store: ThemeStore
+    @Environment(\.dynamicTypeSize) private var typeSize
+    /// A card's narrowest width, growing with the text so names wrap at whole words.
+    @ScaledMetric(relativeTo: .subheadline) private var cardWidth: CGFloat = 165
     private let allSeasons: Bool
     private let isLocked: (Theme) -> Bool
 
@@ -26,13 +29,20 @@ public struct ThemePicker: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 section(Localized.string("Color mode")) {
-                    HStack(spacing: 8) {
-                        ForEach(ColorMode.allCases) { mode in modeButton(mode) }
+                    // Four across when every word fits; stacked, one per row, at the
+                    // largest text sizes or when a language's words run longer.
+                    if large {
+                        modes(stacked: true)
+                    } else {
+                        ViewThatFits(in: .horizontal) {
+                            modes(stacked: false)
+                            modes(stacked: true)
+                        }
                     }
                 }
                 ForEach(store.visibleGroups(on: now, allSeasons: allSeasons)) { group in
                     section(group.localizedTitle, badge: badge(for: group, on: now)) {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                        LazyVGrid(columns: columns, spacing: 10) {
                             ForEach(group.themes) { theme in card(theme) }
                         }
                     }
@@ -47,6 +57,13 @@ public struct ThemePicker: View {
         #endif
     }
 
+    /// The accessibility text sizes (the largest five).
+    private var large: Bool { typeSize.isAccessibilitySize }
+
+    /// As many cards across as fit at `cardWidth`: two on a phone at most sizes,
+    /// one at the larger ones, more on a wider screen.
+    private var columns: [GridItem] { [GridItem(.adaptive(minimum: cardWidth), spacing: 10)] }
+
     private func badge(for group: ThemeGroup, on date: Date) -> String? {
         guard let season = group.season else { return nil }
         return season.contains(date) ? Localized.string("New") : allSeasons ? season.label() : nil
@@ -55,7 +72,8 @@ public struct ThemePicker: View {
     private func section<Content: View>(_ title: String, badge: String? = nil,
                                         @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
+            // At the largest text sizes the badge ("New", a season's dates) sits under the heading.
+            (large ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6)) : AnyLayout(HStackLayout(spacing: 8))) {
                 Text(title).font(.headline).foregroundStyle(palette.ink.color)
                 if let badge {
                     Text(badge)
@@ -72,14 +90,24 @@ public struct ThemePicker: View {
         }
     }
 
-    private func modeButton(_ mode: ColorMode) -> some View {
+    private func modes(stacked: Bool) -> some View {
+        (stacked ? AnyLayout(VStackLayout(spacing: 8)) : AnyLayout(HStackLayout(spacing: 8))) {
+            ForEach(ColorMode.allCases) { mode in modeButton(mode, stacked: stacked) }
+        }
+    }
+
+    private func modeButton(_ mode: ColorMode, stacked: Bool) -> some View {
         let selected = store.colorMode == mode
         return Button { store.colorMode = mode } label: {
-            // Icon over the word, so four fit across a phone.
-            VStack(spacing: 4) {
+            // Icon over the word, so four fit across a phone; side by side in a
+            // full-width row when stacked.
+            (stacked ? AnyLayout(HStackLayout(spacing: 10)) : AnyLayout(VStackLayout(spacing: 4))) {
                 Image(systemName: mode.systemImage).imageScale(.medium)
-                Text(mode.title).lineLimit(1).minimumScaleFactor(0.8)
+                // Whole words: across, a word that doesn't fit makes the modes stack.
+                Text(mode.title).fixedSize()
+                if stacked { Spacer(minLength: 0) }
             }
+            .padding(.horizontal, stacked ? 14 : 6)
             .font(.subheadline.weight(.semibold))
             .foregroundStyle(palette.ink.color)
             .padding(.vertical, 8)

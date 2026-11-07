@@ -130,7 +130,7 @@ includeBuild("../liftbridge-kit/android")
 then depend on it in the app module:
 
 ```kotlin
-implementation("com.liftbridgelabs:liftbridge-themes:2.6.0")
+implementation("com.liftbridgelabs:liftbridge-themes:2.6.1")
 ```
 
 Gradle builds it from the included source; nothing is downloaded from a package host. (The repo also has a `jitpack.yml`, so the library can be served by JitPack from a release tag instead, if that's chosen.)
