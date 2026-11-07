@@ -103,8 +103,9 @@ public struct ThemePicker: View {
             // full-width row when stacked.
             (stacked ? AnyLayout(HStackLayout(spacing: 10)) : AnyLayout(VStackLayout(spacing: 4))) {
                 Image(systemName: mode.systemImage).imageScale(.medium)
-                // Whole words: across, a word that doesn't fit makes the modes stack.
-                Text(mode.title).fixedSize()
+                // Whole words: across, a word that doesn't fit makes the modes stack;
+                // stacked, a title may still wrap on a very narrow screen.
+                Text(mode.title).fixedSize(horizontal: !stacked, vertical: true)
                 if stacked { Spacer(minLength: 0) }
             }
             .padding(.horizontal, stacked ? 14 : 6)
